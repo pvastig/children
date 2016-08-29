@@ -9,16 +9,10 @@ namespace PavelA
   class iData
   {
   public:
-    iData() : m_countLines(0) {};
+    iData() {};
     virtual ~iData() {};
-    virtual void readFromFile(const std::string& fileNameIn) = 0;
-
-
-    virtual void printData() = 0;
-
-  protected:
-    unsigned int m_countLines;
-
+    virtual void read(const std::string&) = 0;
+    virtual void print() = 0;
     iData(const iData &) = delete;
     iData & operator=(const iData &) = delete;
   };
@@ -36,27 +30,28 @@ namespace PavelA
   class DataNames : public iData
   {
   public:
-    void readFromFile(const std::string & fileNameIn) override;
-    void printData() override;
-    
+    void read(const std::string & fileName) override;
+    void print() override;
     const StringSet & getData() const { return m_names; }
 
   private:
     StringSet m_names;
-    std::string m_fileNameIn;
+    std::string m_fileName;
+    size_t m_countLines;
   };
 
   class DataRelationsName : public iData
   {
   public:
-    void readFromFile(const std::string & fileNameIn);
-    void printData() override;
+    void read(const std::string & fileNameIn);
+    void print() override;
 
     const StringArrayUnordMap & getData() const { return m_namesRelations; }
 
   private:
     StringArrayUnordMap m_namesRelations;
-    std::string m_fileNameIn;
+    std::string m_fileName;
+    size_t m_countLines;
   };
 
   class ProcessData
@@ -81,25 +76,21 @@ namespace PavelA
     char ** m_argv;
     DataNames m_dataNames;
     DataRelationsName m_dataRelationName;
-
   };
 
   template<typename Any>
   void printData(const Any& container)
   {
     std::cout << "\n**************** Printed data" << std::endl;
-    {
-      for (const auto& it : container)
-        std::cout << it << '\n';
-    }
+    std::copy(container.begin(), container.end(), std::ostream_iterator<Any::value_type>(std::cout, "\n"));
   }
 
   template<typename Any>
   void printDataMap(const Any& container)
   {
     std::cout << "\n**************** Printed data" << std::endl;
-    for (const auto& it : container)
-      std::cout << it.first << ' ' << it.second << '\n';
+    for (const auto& item : container)
+      std::cout << item.first << ' ' << item.second << '\n';
   }
 };
 

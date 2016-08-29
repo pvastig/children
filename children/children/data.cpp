@@ -4,14 +4,14 @@
 
 namespace PavelA
 {
-  void DataNames::readFromFile(const std::string & fileNameIn)
+  void DataNames::read(const std::string & fileName)
   {
-    std::ifstream ifs(fileNameIn.c_str(), std::ios_base::in);
+    std::ifstream ifs(fileName.c_str(), std::ios_base::in);
     if (!ifs.is_open())
-      throw std::invalid_argument("Error getting file: " + fileNameIn);
+      throw std::invalid_argument("Error getting file: " + fileName);
     
-    m_fileNameIn = fileNameIn;
-    std::cout << "\nReading data from " << m_fileNameIn << std::endl;
+    m_fileName = fileName;
+    std::cout << "\nReading data from " << m_fileName << std::endl;
     std::string curLine;
     while (std::getline(ifs, curLine))
     {
@@ -26,27 +26,26 @@ namespace PavelA
       if (bool inserted = !m_names.insert(curLine).second)
         std::cout << "line:" << m_countLines << " duplicated data: " << curLine << '\n';
     }
-
-    ifs.close();
+    if (ifs.is_open())
+      ifs.close();
 
     std::cout << "Reading is finished\n";
   }
 
-  void DataNames::printData()
+  void DataNames::print()
   {
-    std::cout << "\n**************** Printed data from file " << m_fileNameIn << std::endl;
-    for (const auto & name : m_names)
-      std::cout << name << '\n';
+    std::cout << "\n**************** Printed data from file " << m_fileName << std::endl;
+    printData(m_names);
   }
 
-  void DataRelationsName::readFromFile(const std::string & fileNameIn)
+  void DataRelationsName::read(const std::string & fileNameIn)
   {
     std::ifstream ifs(fileNameIn.c_str(), std::ios_base::in);
     if (!ifs.is_open())
       throw std::invalid_argument("Error getting file:" + fileNameIn);
 
-    m_fileNameIn = fileNameIn;
-    std::cout << "\nReading data from " << m_fileNameIn << std::endl;
+    m_fileName = fileNameIn;
+    std::cout << "\nReading data from " << m_fileName << std::endl;
     std::string curLine;
     while (std::getline(ifs, curLine))
     {
@@ -79,12 +78,12 @@ namespace PavelA
     std::cout << "Reading is finished\n";
   }
 
-  void DataRelationsName::printData()
+  void DataRelationsName::print()
   {
-    std::cout << "\n**************** Printed data from file " << m_fileNameIn<< std::endl;
+    std::cout << "\n**************** Printed data from file " << m_fileName << std::endl;
     for (const auto& nameRelation : m_namesRelations)
     {
-      const StringUnordSet & aStrings = nameRelation.second;
+      const auto & aStrings = nameRelation.second;
       std::cout << nameRelation.first << '\t' << *aStrings.begin() << '\n';
       for (auto it = ++aStrings.begin(); it != aStrings.end(); ++it)
         std::cout << '\t' << *it << '\n';
@@ -96,8 +95,8 @@ namespace PavelA
     if (argc != 3)
       throw std::invalid_argument("You should enter input files");
 
-    m_dataNames.readFromFile(argv[1]);
-    m_dataRelationName.readFromFile(argv[2]);
+    m_dataNames.read(argv[1]);
+    m_dataRelationName.read(argv[2]);
 
    /* for (const auto & data : m_pDataArray)
     {

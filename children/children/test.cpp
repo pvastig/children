@@ -10,15 +10,15 @@ namespace Test
   void testReadDataNames()
   {
     DataNames dataNames;
-    dataNames.readFromFile("test/test_reading_names.dat");
-    dataNames.printData();
+    dataNames.read("test/test_reading_names.dat");
+    dataNames.print();
   }
 
   void testReadDataRelations()
   {
     DataRelationsName dataRelations;
-    dataRelations.readFromFile("test/test_reading_relations.dat");
-    dataRelations.printData();
+    dataRelations.read("test/test_reading_relations.dat");
+    dataRelations.print();
   }
 
   void testUnlovedChildrenList()
