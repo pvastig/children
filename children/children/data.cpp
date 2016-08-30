@@ -4,12 +4,15 @@
 
 namespace PavelA
 {
-  void DataNames::read(const std::string & fileName)
+  #define ENDLINE '\n'
+  const std::string msgFinishedReading("Reading has been finished");
+
+  void DataNames::read(const std::string& fileName)
   {
     std::ifstream ifs(fileName.c_str(), std::ios_base::in);
     if (!ifs.is_open())
       throw std::invalid_argument("Error getting file: " + fileName);
-    
+
     m_fileName = fileName;
     std::cout << "\nReading data from " << m_fileName << std::endl;
     std::string curLine;
@@ -19,17 +22,17 @@ namespace PavelA
       //skip empty strings
       if (curLine.empty())
       {
-        std::cout << "line:" << m_countLines << " is empty" << '\n';
+        std::cout << "line:" << m_countLines << " is empty" << ENDLINE;
         continue;
       }
 
       if (bool inserted = !m_names.insert(curLine).second)
-        std::cout << "line:" << m_countLines << " duplicated data: " << curLine << '\n';
+        std::cout << "line:" << m_countLines << " duplicated data: " << curLine << ENDLINE;
     }
     if (ifs.is_open())
       ifs.close();
 
-    std::cout << "Reading is finished\n";
+    std::cout << msgFinishedReading << std::endl;
   }
 
   void DataNames::print()
@@ -73,9 +76,10 @@ namespace PavelA
       m_namesRelations[word1].insert(word2);
     }
 
-    ifs.close();
+    if (ifs.is_open())
+      ifs.close();
 
-    std::cout << "Reading is finished\n";
+    std::cout << "Reading has been finished\n";
   }
 
   void DataRelationsName::print()
@@ -98,18 +102,18 @@ namespace PavelA
     m_dataNames.read(argv[1]);
     m_dataRelationName.read(argv[2]);
 
-   /* for (const auto & data : m_pDataArray)
-    {
-      assert(data.get());
-      if (!data.get())
-        throw std::runtime_error("Invalid pointer");
+    /* for (const auto & data : m_pDataArray)
+     {
+       assert(data.get());
+       if (!data.get())
+         throw std::runtime_error("Invalid pointer");
 
-      if (DataNames * pDataNames = dynamic_cast<DataNames*>(data.get()))
-        m_names = pDataNames->getData();
+       if (DataNames * pDataNames = dynamic_cast<DataNames*>(data.get()))
+         m_names = pDataNames->getData();
 
-      if (DataNamesRelations * pDataRelations = dynamic_cast<DataNamesRelations*>(data.get()))
-        m_namesRelations = pDataRelations->getData();
-    }*/
+       if (DataNamesRelations * pDataRelations = dynamic_cast<DataNamesRelations*>(data.get()))
+         m_namesRelations = pDataRelations->getData();
+     }*/
   }
 
   StringList ProcessData::unlovedChildrenNames() const
@@ -191,6 +195,78 @@ namespace PavelA
     }
 
     return aFavouriteChildrenNames;
+  }
+
+  void ProcessData::run()
+  {
+    enum class eUserSelect : char
+    {
+      eExit = 0,
+      eUnlovedChildrenNames,
+      eUnhappyChildrenNames,
+      eFavouriteChildrenNames,
+      ePrintData
+    };
+
+
+    const std::string menu = "\nPlease, select action:\n"
+      "1 - unloved children\n"
+      "2 - unhappy children\n"
+      "3 - favorite children\n"
+      "4 - print loaded data\n"
+      "------------------------\n"
+      "0 - exit\n";
+
+    int num = 0;
+    bool readAgain = true;
+    do
+    {
+      std::cout << menu << std::endl;
+      std::cin >> num;
+      if (!std::cin)
+      {
+        std::cin.clear();
+        std::string s;
+        std::cin >> s;
+        std::cout << "You entered " << '"' << s << '"' << " please, try again" << std::endl;;
+      }
+      switch ((eUserSelect)num)
+      {
+        case eUserSelect::eUnlovedChildrenNames:
+        {
+          PavelA::printData(unlovedChildrenNames());
+          break;
+        }
+        case eUserSelect::eUnhappyChildrenNames:
+        {
+          PavelA::printData(unhappyChildrenNames());
+          break;
+        }
+        case eUserSelect::eFavouriteChildrenNames:
+        {
+          PavelA::printData(favouriteChildrenNames());
+          break;
+        }
+        case eUserSelect::ePrintData:
+        {
+          //it needs to improve
+          /*          const PavelA::DataPtrArray & aData = prData.getDataPtrArray();
+          for (const auto & data : aData)
+          data->printData();*/
+          break;
+        }
+        case eUserSelect::eExit:
+        {
+          std::cout << "Bye-bye :)" << std::endl;
+          readAgain = false;
+          break;
+        }
+        default:
+        std::cout << "You entered not existed action, please, try again" << std::endl;
+        break;
+      }
+
+    } while (readAgain);
   }
 
 };//end namespace PaveA

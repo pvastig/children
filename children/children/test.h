@@ -4,6 +4,7 @@
 
 namespace Test
 {
+  void testTemplates();
   void testReadDataNames();
   void testReadDataRelations();
 

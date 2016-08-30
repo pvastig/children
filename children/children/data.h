@@ -58,18 +58,18 @@ namespace PavelA
   {
   public:
     ProcessData(const int argc, char ** argv);
-
-    //1 list of unloved children
-    StringList unlovedChildrenNames() const;
-
-    //2 list of unhappy children
-    StringList unhappyChildrenNames() const;
-
-    //3 list of favorite children
-    StringList favouriteChildrenNames() const;
+    void run();
 
     ProcessData(ProcessData&) = delete;
     ProcessData & operator=(ProcessData&) = delete;
+
+  private:
+    //1 list of unloved children
+    StringList unlovedChildrenNames() const;
+    //2 list of unhappy children
+    StringList unhappyChildrenNames() const;
+    //3 list of favorite children
+    StringList favouriteChildrenNames() const;
 
   private:
     const int m_argc;
@@ -91,6 +91,19 @@ namespace PavelA
     std::cout << "\n**************** Printed data" << std::endl;
     for (const auto& item : container)
       std::cout << item.first << ' ' << item.second << '\n';
+  }
+
+  template<typename Str>
+  void printArg(const Str& str)
+  {
+    std::cout << str;
+  }
+
+  template<typename Str, typename... Args>
+  void printArg(const Str& first, Args&&... args)
+  {
+    std::cout << first;
+    printArg(std::forward<Args>(args)...);
   }
 };
 

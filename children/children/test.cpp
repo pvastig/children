@@ -7,6 +7,11 @@ using namespace PavelA;
 
 namespace Test
 {
+  void testTemplates()
+  {
+    printArg("Pavela ", 1, " test ", 2, '\n', "new line", '\n');
+  }
+
   void testReadDataNames()
   {
     DataNames dataNames;
