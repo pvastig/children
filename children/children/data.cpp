@@ -4,17 +4,17 @@
 
 namespace PavelA
 {
-  #define ENDLINE '\n'
   const std::string msgFinishedReading("Reading has been finished");
+  const std::string msgPintedDataFromFile("**************** Printed data from file ");
 
-  void DataNames::read(const std::string& fileName)
+  void Names::read(const std::string& fileName)
   {
     std::ifstream ifs(fileName.c_str(), std::ios_base::in);
     if (!ifs.is_open())
       throw std::invalid_argument("Error getting file: " + fileName);
 
     m_fileName = fileName;
-    std::cout << "\nReading data from " << m_fileName << std::endl;
+    utils::printArgs(NEWLINE, "Reading data from ", m_fileName);
     std::string curLine;
     while (std::getline(ifs, curLine))
     {
@@ -22,33 +22,34 @@ namespace PavelA
       //skip empty strings
       if (curLine.empty())
       {
-        std::cout << "line:" << m_countLines << " is empty" << ENDLINE;
+        utils::printArgs(NEWLINE, "line: ", m_countLines, "is empty");
         continue;
       }
 
       if (bool inserted = !m_names.insert(curLine).second)
-        std::cout << "line:" << m_countLines << " duplicated data: " << curLine << ENDLINE;
+        utils::printArgs(NEWLINE, "line: ", m_countLines, " duplicated data : ", curLine);
     }
     if (ifs.is_open())
       ifs.close();
 
-    std::cout << msgFinishedReading << std::endl;
+    utils::printArgs(NEWLINE, msgFinishedReading);
   }
 
-  void DataNames::print()
+  void Names::print()
   {
-    std::cout << "\n**************** Printed data from file " << m_fileName << std::endl;
-    printData(m_names);
+    utils::printArgs(NEWLINE, msgPintedDataFromFile, m_fileName);
+    utils::printData(m_names);
   }
 
-  void DataRelationsName::read(const std::string & fileNameIn)
+  void ChildrenRelations::read(const std::string& fileName)
   {
-    std::ifstream ifs(fileNameIn.c_str(), std::ios_base::in);
+    std::ifstream ifs(fileName.c_str(), std::ios_base::in);
     if (!ifs.is_open())
-      throw std::invalid_argument("Error getting file:" + fileNameIn);
+      throw std::invalid_argument("Error getting file:" + fileName);
 
-    m_fileName = fileNameIn;
-    std::cout << "\nReading data from " << m_fileName << std::endl;
+    m_fileName = fileName;
+    utils::printArgs(NEWLINE, "Reading data from ", m_fileName);
+
     std::string curLine;
     while (std::getline(ifs, curLine))
     {
@@ -56,7 +57,7 @@ namespace PavelA
       //skip empty strings
       if (curLine.empty())
       {
-        std::cout << "line:" << m_countLines << " is empty" << '\n';
+        utils::printArgs(NEWLINE, "line: ", m_countLines, "is empty");
         continue;
       }
 
@@ -66,7 +67,7 @@ namespace PavelA
       inStream >> word1 >> word2;
       if (word1.empty() || word2.empty())
       {
-        std::cout << "line:" << m_countLines << " has invalid data: " << "\"" << word1 << "\" " << " \"" << word2 << "\"" << '\n';
+        utils::printArgs(NEWLINE, "line: ", m_countLines, " has invalid data: \"", word1, "\"\"", word2, "\"");
         continue;
       }
 
@@ -79,47 +80,37 @@ namespace PavelA
     if (ifs.is_open())
       ifs.close();
 
-    std::cout << "Reading has been finished\n";
+    utils::printArgs(NEWLINE, msgFinishedReading);
   }
 
-  void DataRelationsName::print()
+  void ChildrenRelations::print()
   {
-    std::cout << "\n**************** Printed data from file " << m_fileName << std::endl;
+    utils::printArgs(NEWLINE, msgPintedDataFromFile, m_fileName);
     for (const auto& nameRelation : m_namesRelations)
     {
       const auto & aStrings = nameRelation.second;
-      std::cout << nameRelation.first << '\t' << *aStrings.begin() << '\n';
+      if (aStrings.empty())
+        continue;
+      utils::printArgs(NEWLINE, nameRelation.first, '\t', *aStrings.begin());
       for (auto it = ++aStrings.begin(); it != aStrings.end(); ++it)
-        std::cout << '\t' << *it << '\n';
+        utils::printArgs('\t', *it, '\n');
     }
   }
 
-  ProcessData::ProcessData(const int argc, char ** argv) : m_argc(argc), m_argv(argv)
+  ProcessData::ProcessData(const int argc, char ** const argv) 
+    : m_argc(argc), m_argv(argv)
   {
     if (argc != 3)
       throw std::invalid_argument("You should enter input files");
 
-    m_dataNames.read(argv[1]);
-    m_dataRelationName.read(argv[2]);
-
-    /* for (const auto & data : m_pDataArray)
-     {
-       assert(data.get());
-       if (!data.get())
-         throw std::runtime_error("Invalid pointer");
-
-       if (DataNames * pDataNames = dynamic_cast<DataNames*>(data.get()))
-         m_names = pDataNames->getData();
-
-       if (DataNamesRelations * pDataRelations = dynamic_cast<DataNamesRelations*>(data.get()))
-         m_namesRelations = pDataRelations->getData();
-     }*/
+    m_names.read(argv[1]);
+    m_childrenRelations.read(argv[2]);
   }
 
   StringList ProcessData::unlovedChildrenNames() const
   {
-    const auto& names = m_dataNames.getData();
-    const auto& namesRelations = m_dataRelationName.getData();
+    const auto& names = m_names.getData();
+    const auto& namesRelations = m_childrenRelations.getData();
     StringSet namesRelSet;
     for (const auto & nameRelation : namesRelations)
     {
@@ -134,8 +125,8 @@ namespace PavelA
 
   StringList ProcessData::unhappyChildrenNames() const
   {
-    const auto& names = m_dataNames.getData();
-    const auto& namesRelations = m_dataRelationName.getData();
+    const auto& names = m_names.getData();
+    const auto& namesRelations = m_childrenRelations.getData();
 
     StringList unhappyChildrenNames;
     StringUnordSet happyNames;
@@ -165,8 +156,8 @@ namespace PavelA
 
   StringList ProcessData::favouriteChildrenNames() const
   {
-    const auto& names = m_dataNames.getData();
-    const auto& namesRelations = m_dataRelationName.getData();
+    const auto& names = m_names.getData();
+    const auto& namesRelations = m_childrenRelations.getData();
     std::multiset<std::string> namesMultiSet;
     //collect all names from liked children
     for (const auto & nameRelation : namesRelations)
@@ -221,7 +212,7 @@ namespace PavelA
     bool readAgain = true;
     do
     {
-      std::cout << menu << std::endl;
+      utils::printArgs(menu);
       std::cin >> num;
       if (!std::cin)
       {
@@ -234,35 +225,35 @@ namespace PavelA
       {
         case eUserSelect::eUnlovedChildrenNames:
         {
-          PavelA::printData(unlovedChildrenNames());
+          utils::printData(unlovedChildrenNames());
           break;
         }
         case eUserSelect::eUnhappyChildrenNames:
         {
-          PavelA::printData(unhappyChildrenNames());
+          utils::printData(unhappyChildrenNames());
           break;
         }
         case eUserSelect::eFavouriteChildrenNames:
         {
-          PavelA::printData(favouriteChildrenNames());
+          utils::printData(favouriteChildrenNames());
           break;
         }
         case eUserSelect::ePrintData:
         {
-          //it needs to improve
-          /*          const PavelA::DataPtrArray & aData = prData.getDataPtrArray();
-          for (const auto & data : aData)
-          data->printData();*/
+          DataPtrArray aData { &m_names, &m_childrenRelations };
+          for (const auto& data : aData)
+            data->print();
+
           break;
         }
         case eUserSelect::eExit:
         {
-          std::cout << "Bye-bye :)" << std::endl;
+          utils::printArgs(NEWLINE, "Bye-bye :)");
           readAgain = false;
           break;
         }
         default:
-        std::cout << "You entered not existed action, please, try again" << std::endl;
+        utils::printArgs(NEWLINE, "You entered not existed action, please, try again");
         break;
       }
 

@@ -63,3 +63,4 @@ Temporary Items
 *sdf
 *.props
 *.iobj
+/children/#Verone/incremental_index

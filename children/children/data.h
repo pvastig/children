@@ -13,26 +13,26 @@ namespace PavelA
     virtual ~iData() {};
     virtual void read(const std::string&) = 0;
     virtual void print() = 0;
+
     iData(const iData &) = delete;
     iData & operator=(const iData &) = delete;
   };
 
-  typedef std::unique_ptr<iData>   DataPtr;
-  typedef std::vector<DataPtr>     DataPtrArray;
-  typedef std::forward_list<std::string> StringList;
-  typedef std::vector<std::string> StringArray;
-  typedef std::set<std::string>    StringSet;
-  typedef std::unordered_set<std::string>  StringUnordSet;
-  typedef std::map<std::string, StringSet> StringArrayMap;
-  typedef std::unordered_map<std::string, StringUnordSet> StringArrayUnordMap;
-  typedef std::map<std::string, size_t> StringMap;
+  using DataPtrArray = std::vector<iData*>;
+  using StringList = std::forward_list<std::string>;
+  using StringArray = std::vector<std::string>;
+  using StringSet = std::set<std::string>;
+  using StringUnordSet = std::unordered_set<std::string>;
+  using StringArrayMap = std::map<std::string, StringSet>;
+  using StringArrayUnordMap = std::unordered_map<std::string, StringUnordSet>;
+  using StringMap = std::map<std::string, size_t>;
 
-  class DataNames : public iData
+  class Names : public iData
   {
   public:
-    void read(const std::string & fileName) override;
+    void read(const std::string& fileName) override;
     void print() override;
-    const StringSet & getData() const { return m_names; }
+    const StringSet& getData() const { return m_names; }
 
   private:
     StringSet m_names;
@@ -40,13 +40,12 @@ namespace PavelA
     size_t m_countLines;
   };
 
-  class DataRelationsName : public iData
+  class ChildrenRelations : public iData
   {
   public:
-    void read(const std::string & fileNameIn);
+    void read(const std::string& fileNameIn);
     void print() override;
-
-    const StringArrayUnordMap & getData() const { return m_namesRelations; }
+    const StringArrayUnordMap& getData() const { return m_namesRelations; }
 
   private:
     StringArrayUnordMap m_namesRelations;
@@ -57,7 +56,7 @@ namespace PavelA
   class ProcessData
   {
   public:
-    ProcessData(const int argc, char ** argv);
+    ProcessData(const int argc, char ** const argv);
     void run();
 
     ProcessData(ProcessData&) = delete;
@@ -73,38 +72,10 @@ namespace PavelA
 
   private:
     const int m_argc;
-    char ** m_argv;
-    DataNames m_dataNames;
-    DataRelationsName m_dataRelationName;
+    char ** const m_argv;
+    Names m_names;
+    ChildrenRelations m_childrenRelations;
   };
-
-  template<typename Any>
-  void printData(const Any& container)
-  {
-    std::cout << "\n**************** Printed data" << std::endl;
-    std::copy(container.begin(), container.end(), std::ostream_iterator<Any::value_type>(std::cout, "\n"));
-  }
-
-  template<typename Any>
-  void printDataMap(const Any& container)
-  {
-    std::cout << "\n**************** Printed data" << std::endl;
-    for (const auto& item : container)
-      std::cout << item.first << ' ' << item.second << '\n';
-  }
-
-  template<typename Str>
-  void printArg(const Str& str)
-  {
-    std::cout << str;
-  }
-
-  template<typename Str, typename... Args>
-  void printArg(const Str& first, Args&&... args)
-  {
-    std::cout << first;
-    printArg(std::forward<Args>(args)...);
-  }
 };
 
 #endif //_data_h__

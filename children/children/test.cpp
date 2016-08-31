@@ -9,19 +9,19 @@ namespace Test
 {
   void testTemplates()
   {
-    printArg("Pavela ", 1, " test ", 2, '\n', "new line", '\n');
+    utils::printArgs("Pavela ", 1, " test ", 2, '\n', "new line", '\n');
   }
 
   void testReadDataNames()
   {
-    DataNames dataNames;
+    Names dataNames;
     dataNames.read("test/test_reading_names.dat");
     dataNames.print();
   }
 
   void testReadDataRelations()
   {
-    DataRelationsName dataRelations;
+    ChildrenRelations dataRelations;
     dataRelations.read("test/test_reading_relations.dat");
     dataRelations.print();
   }
