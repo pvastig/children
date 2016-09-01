@@ -9,13 +9,22 @@ namespace PavelA
   class iData
   {
   public:
-    iData() {};
+    iData() {}
     virtual ~iData() {};
     virtual void read(const std::string&) = 0;
     virtual void print() = 0;
 
     iData(const iData &) = delete;
     iData & operator=(const iData &) = delete;
+  };
+
+  class DataFile : public iData
+  {
+  public:
+    virtual ~DataFile() {}
+  protected:
+    std::string m_fileName;
+    size_t m_countLines;
   };
 
   using DataPtrArray = std::vector<iData*>;
@@ -27,7 +36,7 @@ namespace PavelA
   using StringArrayUnordMap = std::unordered_map<std::string, StringUnordSet>;
   using StringMap = std::map<std::string, size_t>;
 
-  class Names : public iData
+  class Names : public DataFile
   {
   public:
     void read(const std::string& fileName) override;
@@ -36,11 +45,9 @@ namespace PavelA
 
   private:
     StringSet m_names;
-    std::string m_fileName;
-    size_t m_countLines;
   };
 
-  class ChildrenRelations : public iData
+  class ChildrenRelations : public DataFile
   {
   public:
     void read(const std::string& fileNameIn);
@@ -49,8 +56,6 @@ namespace PavelA
 
   private:
     StringArrayUnordMap m_namesRelations;
-    std::string m_fileName;
-    size_t m_countLines;
   };
 
   class ProcessData

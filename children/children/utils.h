@@ -25,14 +25,12 @@ namespace utils
   template<typename Any>
   void printData(const Any& container)
   {
-    printArgs("\n**************** Printed data\n");
     std::copy(container.begin(), container.end(), std::ostream_iterator<Any::value_type>(std::cout, "\n"));
   }
 
   template<typename Any>
   void printDataMap(const Any& container)
   {
-    printArgs("\n**************** Printed data map\n");
     for (const auto& item : container)
       printArg(item.first, ' ', item.second, PavelA::NEWLINE)
   }
