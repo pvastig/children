@@ -1,37 +1,37 @@
 #pragma once
-
-#include <iostream>
-
-namespace PavelA
-{
-  #define NEWLINE '\n'
-}
+#ifndef _utils_h_
+#define _utils_h_
 
 namespace utils
 {
+  #define NEWLINE "\n"
+
   template<class Any>
-  void printArgs(const Any& str)
+  void printArgs(Any&& str)
   {
-    std::cout << str;
+    std::cout << std::forward<Any>(str);
   }
 
   template<class Any, typename... Args>
-  void printArgs(const Any& first, Args&&... args)
+  void printArgs(Any&& first, Args&&... args)
   {
-    std::cout << first;
-    printArgs(std::forward<Args>(args)...);
+    std::cout << std::forward<Any>(first);
+    printArgs(args...);
   }
 
   template<typename Any>
   void printData(const Any& container)
   {
-    std::copy(container.begin(), container.end(), std::ostream_iterator<Any::value_type>(std::cout, "\n"));
+    std::cout << NEWLINE;
+    for (const auto& item : container)
+      printArgs(item, NEWLINE);
   }
 
   template<typename Any>
   void printDataMap(const Any& container)
   {
     for (const auto& item : container)
-      printArg(item.first, ' ', item.second, PavelA::NEWLINE)
+      printArgs(item.first, ' ', item.second, NEWLINE)
   }
 }
+#endif // _utils_h_

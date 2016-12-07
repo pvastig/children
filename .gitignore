@@ -64,3 +64,4 @@ Temporary Items
 *.props
 *.iobj
 /children/#Verone/incremental_index
+*.codeanalysis

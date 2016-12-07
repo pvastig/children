@@ -4,15 +4,14 @@
 
 namespace Test
 {
-  void testTemplates();
-  void testReadDataNames();
-  void testReadDataRelations();
+  void printArgs();
+  void readDataNames();
+  void readDataRelations();
 
-  void testUnlovedChildrenList();
-  void testUnhappyChildrenList();
-  void testFavouriteChildrenList();
+  void unlovedChildrenList();
+  void unhappyChildrenList();
+  void favouriteChildrenList();
 
   void testAll();
-
 };
 #endif //_test_h__
