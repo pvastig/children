@@ -16,7 +16,7 @@ public:
   {
   };
   virtual void read(const std::string&) = 0;
-  virtual void print() = 0;
+  virtual void print() const = 0;
 
   iData(const iData &) = delete;
   iData & operator=(const iData &) = delete;
@@ -46,7 +46,7 @@ class Names : public DataFile
 {
 public:
   void read(const std::string& fileName) override;
-  void print() override;
+  void print() const override;
   const StringUnordSet& getData() const { return m_names; }
 
 private:
@@ -57,7 +57,7 @@ class ChildrenRelations : public DataFile
 {
 public:
   void read(const std::string& fileNameIn);
-  void print() override;
+  void print() const override;
   const StringArrayUnordMap& getData() const { return m_namesRelations; }
 
 private:

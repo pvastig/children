@@ -33,7 +33,7 @@ void Names::read(const std::string& fileName)
   utils::printArgs(NEWLINE, msgFinishedReading);
 }
 
-void Names::print()
+void Names::print() const
 {
   utils::printArgs(NEWLINE, msgPintedDataFromFile, m_fileName);
   utils::printData(m_names);
@@ -77,7 +77,7 @@ void ChildrenRelations::read(const std::string& fileName)
   utils::printArgs(NEWLINE, msgFinishedReading);
 }
 
-void ChildrenRelations::print()
+void ChildrenRelations::print() const
 {
   utils::printArgs(NEWLINE, msgPintedDataFromFile, m_fileName);
   for (const auto& nameRelation : m_namesRelations)
@@ -146,35 +146,23 @@ StringList ProcessData::unhappyChildrenNames() const
 {
   const auto& names = m_names.getData();
   const auto& childrenRelations = m_childrenRelations.getData();
-
   StringList unhappyChildrenNames;
-  StringUnordSet happyChildrenNames;
   for (const auto& name : names)
   {
-    const auto foundRelationName = childrenRelations.find(name);
-    if (foundRelationName == childrenRelations.end())
-      continue;
-
-    const auto& relationNames = foundRelationName->second;
-    for (const auto& relationName : relationNames)
+    bool foundHappyName = false;
+    for (const auto& relationName : childrenRelations)
     {
-      const auto foundName = childrenRelations.find(relationName);
-      if (foundName == childrenRelations.end())
+      const auto foundName = relationName.second.find(name);
+      if (foundName != relationName.second.end())
       {
-        happyChildrenNames.insert(name);
-        continue;
+        foundHappyName = true;
+        break;
       }
-
-      const auto& checkedNames = foundName->second;
-      if ((checkedNames.find(name) == checkedNames.end()) && (happyChildrenNames.find(name) == happyChildrenNames.end()))
-        unhappyChildrenNames.push_front(name);
-      else
-        happyChildrenNames.insert(name);
     }
+    if (!foundHappyName)
+      unhappyChildrenNames.push_front(name);
   }
 
-  utils::printData(unhappyChildrenNames);
-  //utils::printData(happyChildrenNames);
   return unhappyChildrenNames;
 }
 

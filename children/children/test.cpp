@@ -55,9 +55,7 @@ void unhappyChildrenList()
 
   ProcessData prData(argc, argv);
   const auto unhappyChildrenNames = prData.unhappyChildrenNames();
-  std::cout << std::endl;
-  utils::printData(unhappyChildrenNames);
-  StringList comparedNames { "Vasya","Masha" };
+  StringList comparedNames { "Vasya","Marina", "Richard5"};
   auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
   auto size2 = std::distance(unhappyChildrenNames.cbegin(), unhappyChildrenNames.cend());
   assert(size1 == size2);
