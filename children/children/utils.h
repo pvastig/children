@@ -31,7 +31,7 @@ namespace utils
   void printDataMap(const Any& container)
   {
     for (const auto& item : container)
-      printArgs(item.first, ' ', item.second, NEWLINE)
+      printArgs(item.first, ' ', item.second, NEWLINE);
   }
 }
 #endif // _utils_h_
