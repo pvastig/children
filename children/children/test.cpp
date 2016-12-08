@@ -40,10 +40,7 @@ void unlovedChildrenList()
   auto size2 = std::distance(unlovedChildrenNames.cbegin(), unlovedChildrenNames.cend());
   assert(size1 == size2);
   for (auto it1 = comparedNames.cbegin(), it2 = unlovedChildrenNames.cbegin(); it1 != comparedNames.end(); ++it1, ++it2)
-  {
-    utils::printArgs(NEWLINE, *it1, "--->", *it2);
     assert(*it1 == *it2);
-  }
 }
 
 void unhappyChildrenList()
@@ -61,41 +58,25 @@ void unhappyChildrenList()
   assert(size1 == size2);
 
   for (auto it1 = comparedNames.cbegin(), it2 = unhappyChildrenNames.cbegin(); it1 != comparedNames.end(); ++it1, ++it2)
-  {
-    utils::printArgs(NEWLINE, *it1, "--->", *it2);
     assert(*it1 == *it2);
-  }
 }
 
 void favouriteChildrenList()
 {
   int argc = 3;
-  char * argv[3];
-  argv[0] = "program name";
-  argv[1] = "test/test_favourite_children_names.dat";
-  argv[2] = "test/test_favourite_children_relations.dat";
+  char* argv[3] = { "dummy",
+                     "test/test_favourite_children_names.dat",
+                     "test/test_favourite_children_relations.dat" };
 
-  /*ProcessData prData(argc, argv);
-  const DataPtrArray & aData = prData.getDataPtrArray();
-  for (const auto & data : aData)
-    data->printData();*/
+  ProcessData prData(argc, argv);
+  const auto favouriteChildrenNames = prData.favouriteChildrenNames();
+  StringList comparedNames{ "Masha", "Oleg" };
+  auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
+  auto size2 = std::distance(favouriteChildrenNames.cbegin(), favouriteChildrenNames.cend());
+  assert(size1 == size2);
 
-    /*StringArray favouriteChildrenNames = prData.favouriteChildrenNames();
-    StringArray aCompareNames = {"Oleg", "Masha"};
-    assert(aCompareNames.size() == favouriteChildrenNames.size());
-
-    for (size_t i = 0; i < aCompareNames.size(); ++i)
-    {
-      const std::string & strCmpName = aCompareNames[i];
-      const std::string & strFavouriteChildName = favouriteChildrenNames[i];
-
-      if (strCmpName.compare(strFavouriteChildName) != 0)
-      {
-        std::cout << strCmpName << " != " << strFavouriteChildName << '\n';
-        assert(strCmpName.compare(strFavouriteChildName) == 0);
-      }
-    }
-    printData(favouriteChildrenNames);*/
+  for (auto it1 = comparedNames.cbegin(), it2 = favouriteChildrenNames.cbegin(); it1 != comparedNames.end(); ++it1, ++it2)
+    assert(*it1 == *it2);
 }
 
 void testAll()

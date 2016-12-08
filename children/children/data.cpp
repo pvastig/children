@@ -169,11 +169,11 @@ StringList ProcessData::unhappyChildrenNames() const
 StringList ProcessData::favouriteChildrenNames() const
 {
   const auto& names = m_names.getData();
-  const auto& namesRelations = m_childrenRelations.getData();
+  const auto& childrenRelations = m_childrenRelations.getData();
   std::multiset<std::string> namesMultiSet;
   //collect all names from liked children
-  for (const auto& nameRelation : namesRelations)
-    namesMultiSet.insert(nameRelation.second.begin(), nameRelation.second.end());
+  for (const auto& relationName : childrenRelations)
+    namesMultiSet.insert(relationName.second.begin(), relationName.second.end());
 
   //count names
   std::multimap<size_t, std::string> countNames; //need to sort names using count
@@ -186,18 +186,19 @@ StringList ProcessData::favouriteChildrenNames() const
     countNames.emplace(count, name);
   }
 
-  utils::printDataMap(countNames);
   const auto maxCount = countNames.crbegin()->first;
-  StringList aFavouriteChildrenNames{ countNames.crbegin()->second };
-  for (auto it = ++countNames.crbegin(); it != countNames.crend(); ++it)
-  {
-    if (it->first == maxCount)
-      aFavouriteChildrenNames.push_front(it->second);
-    else
-      break;
-  }
+  StringList favouriteChildrenNames{ countNames.crbegin()->second };
+  std::for_each(std::next(countNames.crbegin()), countNames.crend(),
+                [maxCount, &favouriteChildrenNames] (const auto& item)
+                {
+                  if (item.first != maxCount)
+                    return false;
+                  favouriteChildrenNames.push_front(item.second);
+                  return true;
+                }
+  );
 
-  return aFavouriteChildrenNames;
+  return favouriteChildrenNames;
 }
 
 void ProcessData::run()
