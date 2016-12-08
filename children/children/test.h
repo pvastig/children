@@ -7,11 +7,10 @@ namespace Test
   void printArgs();
   void readDataNames();
   void readDataRelations();
-
   void unlovedChildrenList();
   void unhappyChildrenList();
   void favouriteChildrenList();
 
-  void testAll();
+  void all();
 };
 #endif //_test_h__

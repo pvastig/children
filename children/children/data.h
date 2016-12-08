@@ -58,10 +58,10 @@ class ChildrenRelations : public DataFile
 public:
   void read(const std::string& fileNameIn);
   void print() const override;
-  const StringArrayUnordMap& getData() const { return m_namesRelations; }
+  const StringArrayUnordMap& getData() const { return m_nameRelations; }
 
 private:
-  StringArrayUnordMap m_namesRelations;
+  StringArrayUnordMap m_nameRelations;
 };
 
 class ProcessData

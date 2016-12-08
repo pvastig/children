@@ -71,7 +71,7 @@ void ChildrenRelations::read(const std::string& fileName)
     if (word1 == word2)
       continue;
 
-    m_namesRelations[word1].insert(word2);
+    m_nameRelations[word1].insert(word2);
   }
 
   utils::printArgs(NEWLINE, msgFinishedReading);
@@ -80,21 +80,20 @@ void ChildrenRelations::read(const std::string& fileName)
 void ChildrenRelations::print() const
 {
   utils::printArgs(NEWLINE, msgPintedDataFromFile, m_fileName);
-  for (const auto& nameRelation : m_namesRelations)
+  for (const auto& nameRelation : m_nameRelations)
   {
-    const auto & aStrings = nameRelation.second;
-    if (aStrings.empty())
+    const auto& names = nameRelation.second;
+    if (names.empty())
       continue;
 
     const auto& firstName = nameRelation.first;
-    auto firstRelationName = aStrings.begin();
-
+    const auto& firstRelationName = names.begin();
     utils::printArgs(NEWLINE, firstName, '\t', *firstRelationName, NEWLINE);
-    std::for_each(std::next(aStrings.begin(), 1), aStrings.end(),
+    std::for_each(std::next(names.begin()), names.end(),
                   [](const auto& relationName)
-    {
-      utils::printArgs('\t', relationName, NEWLINE);
-    }
+                  {
+                    utils::printArgs('\t', relationName, NEWLINE);
+                  }
     );
   }
 }
@@ -109,35 +108,34 @@ ProcessData::ProcessData(const int argc, char ** const argv)
   m_childrenRelations.read(argv[2]);
 }
 
+auto intersectSets = [](const auto& strSet1, const auto& strSet2)
+{
+  auto begin1 = strSet1.cbegin();
+  auto end1 = strSet1.cend();
+  auto begin2 = strSet2.cbegin();
+  auto end2 = strSet2.cend();
+  if (strSet1.size() < strSet2.size())
+  {
+    std::swap(begin1, begin2);
+    std::swap(end1, end2);
+  }
+
+  StringList results;
+  std::set_difference(begin1, end1, begin2, end2, std::front_inserter(results));
+
+  return results;
+};
+
 StringList ProcessData::unlovedChildrenNames() const
 {
   const StringSet names(m_names.getData().cbegin(), m_names.getData().cend());
   const auto& childrenRelations = m_childrenRelations.getData();
-
   StringSet namesRelations;
-  for (const auto& nameRelation : childrenRelations)
+  for (const auto& childrenRelation : childrenRelations)
   {
-    const auto& nameReationSet = nameRelation.second;
+    const auto& nameReationSet = childrenRelation.second;
     namesRelations.insert(nameReationSet.begin(), nameReationSet.end());
   }
-
-  auto intersectSets = [](const auto& strSet1, const auto& strSet2)
-  {
-    auto begin1 = strSet1.cbegin();
-    auto end1 = strSet1.cend();
-    auto begin2 = strSet2.cbegin();
-    auto end2 = strSet2.cend();
-    if (strSet1.size() < strSet2.size())
-    {
-      std::swap(begin1, begin2);
-      std::swap(end1, end2);
-    }
-
-    StringList results;
-    std::set_difference(begin1, end1, begin2, end2, std::front_inserter(results));
-
-    return results;
-  };
 
   return intersectSets(names, namesRelations);
 }

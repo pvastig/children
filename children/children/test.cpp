@@ -32,14 +32,20 @@ void unlovedChildrenList()
   char* argv[3] = { "dummy",
                      "test/test_unloved_children_names.dat",
                      "test/test_unloved_children_relations.dat" };
+  StringList comparedNames = { "Vasya", "Richard5", "Marina" };
 
   ProcessData prData(argc, argv);
+
+  utils::Time t;
+  START;
   const auto unlovedChildrenNames = prData.unlovedChildrenNames();
-  StringList comparedNames = { "Vasya", "Richard5", "Marina" };
-  auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
-  auto size2 = std::distance(unlovedChildrenNames.cbegin(), unlovedChildrenNames.cend());
+  END;
+  utils::printArgs(NEWLINE, DURATION, NEWLINE);
+
+  const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
+  const auto size2 = std::distance(unlovedChildrenNames.cbegin(), unlovedChildrenNames.cend());
   assert(size1 == size2);
-  for (auto it1 = comparedNames.cbegin(), it2 = unlovedChildrenNames.cbegin(); it1 != comparedNames.end(); ++it1, ++it2)
+  for (auto it1 = comparedNames.cbegin(), it2 = unlovedChildrenNames.cbegin(); it1 != comparedNames.cend(); ++it1, ++it2)
     assert(*it1 == *it2);
 }
 
@@ -49,15 +55,21 @@ void unhappyChildrenList()
   char* argv[3] = { "dummy",
                      "test/test_unhappy_children_names.dat",
                      "test/test_unhappy_children_relations.dat" };
+  StringList comparedNames{ "Vasya", "Marina", "Richard5" };
 
   ProcessData prData(argc, argv);
+
+  utils::Time t;
+  START;
   const auto unhappyChildrenNames = prData.unhappyChildrenNames();
-  StringList comparedNames { "Vasya","Marina", "Richard5"};
-  auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
-  auto size2 = std::distance(unhappyChildrenNames.cbegin(), unhappyChildrenNames.cend());
+  END;
+  utils::printArgs(NEWLINE, DURATION, NEWLINE);
+
+  const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
+  const auto size2 = std::distance(unhappyChildrenNames.cbegin(), unhappyChildrenNames.cend());
   assert(size1 == size2);
 
-  for (auto it1 = comparedNames.cbegin(), it2 = unhappyChildrenNames.cbegin(); it1 != comparedNames.end(); ++it1, ++it2)
+  for (auto it1 = comparedNames.cbegin(), it2 = unhappyChildrenNames.cbegin(); it1 != comparedNames.cend(); ++it1, ++it2)
     assert(*it1 == *it2);
 }
 
@@ -67,19 +79,24 @@ void favouriteChildrenList()
   char* argv[3] = { "dummy",
                      "test/test_favourite_children_names.dat",
                      "test/test_favourite_children_relations.dat" };
+  StringList comparedNames{ "Masha", "Oleg" };
 
   ProcessData prData(argc, argv);
+  utils::Time t;
+  START;
   const auto favouriteChildrenNames = prData.favouriteChildrenNames();
-  StringList comparedNames{ "Masha", "Oleg" };
-  auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
-  auto size2 = std::distance(favouriteChildrenNames.cbegin(), favouriteChildrenNames.cend());
+  END;
+  utils::printArgs(NEWLINE, DURATION, NEWLINE);
+
+  const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
+  const auto size2 = std::distance(favouriteChildrenNames.cbegin(), favouriteChildrenNames.cend());
   assert(size1 == size2);
 
-  for (auto it1 = comparedNames.cbegin(), it2 = favouriteChildrenNames.cbegin(); it1 != comparedNames.end(); ++it1, ++it2)
+  for (auto it1 = comparedNames.cbegin(), it2 = favouriteChildrenNames.cbegin(); it1 != comparedNames.cend(); ++it1, ++it2)
     assert(*it1 == *it2);
 }
 
-void testAll()
+void all()
 {
   Test::readDataNames();
   Test::readDataRelations();
@@ -87,5 +104,4 @@ void testAll()
   Test::unhappyChildrenList();
   Test::favouriteChildrenList();
 }
-
 };
