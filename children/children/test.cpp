@@ -80,7 +80,7 @@ void favouriteChildrenList()
   const auto favouriteChildrenNames = prData.favouriteChildrenNames();
   END;
   utils::printArgs(NEWLINE, DURATION, NEWLINE);
-
+  utils::printData(favouriteChildrenNames);
   const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
   const auto size2 = std::distance(favouriteChildrenNames.cbegin(), favouriteChildrenNames.cend());
   assert(size1 == size2);
