@@ -15,19 +15,19 @@ void Names::read(const std::string& fileName)
 
   m_fileName = fileName;
   utils::printArgs(NEWLINE, "Reading data from ", m_fileName);
-  std::string curLine;
-  while (std::getline(ifs, curLine))
+  std::string line;
+  while (std::getline(ifs, line))
   {
     ++m_countLines;
     //skip empty strings
-    if (curLine.empty())
+    if (line.empty())
     {
-      utils::printArgs(NEWLINE, "line: ", m_countLines, " is empty");
+      utils::printArgs(NEWLINE, m_countLines, " is empty");
       continue;
     }
 
-    if (bool inserted = !m_names.insert(curLine).second)
-      utils::printArgs(NEWLINE, "line: ", m_countLines, " duplicated data : ", curLine);
+    if (bool inserted = !m_names.insert(line).second)
+      utils::printArgs(NEWLINE, m_countLines, " duplicated data : ", line);
   }
 
   utils::printArgs(NEWLINE, msgFinishedReading);
@@ -48,28 +48,31 @@ void ChildrenRelations::read(const std::string& fileName)
   m_fileName = fileName;
   utils::printArgs(NEWLINE, "Reading data from ", m_fileName);
 
-  std::string curLine;
-  while (std::getline(ifs, curLine))
+  std::string line;
+  std::istringstream iss(line);
+  while (std::getline(ifs, line))
   {
     ++m_countLines;
-    //skip empty strings
-    if (curLine.empty())
+    if (line.empty())
     {
-      utils::printArgs(NEWLINE, "line: ", m_countLines, "is empty");
+      utils::printArgs(NEWLINE,  m_countLines, " is empty");
       continue;
     }
 
-    std::istringstream inStream(curLine);
+    iss.clear();
+    iss.str(line);
     std::string word1, word2;
-    inStream >> word1 >> word2;
-    if (word1.empty() || word2.empty())
+    if (!(iss >> word1 >> word2))
     {
-      utils::printArgs(NEWLINE, "line: ", m_countLines, " has invalid data: \"", word1, "\"\"", word2, "\"");
+      utils::printArgs(NEWLINE, m_countLines, " has invalid data: ", line);
       continue;
     }
 
     if (word1 == word2)
+    {
+      utils::printArgs(NEWLINE, m_countLines, " has same words: ", line);
       continue;
+    }
 
     m_nameRelations[word1].insert(word2);
   }
@@ -107,24 +110,6 @@ ProcessData::ProcessData(const int argc, char ** const argv)
   m_names.read(argv[1]);
   m_childrenRelations.read(argv[2]);
 }
-
-auto intersectSets = [](const auto& strSet1, const auto& strSet2)
-{
-  auto begin1 = strSet1.cbegin();
-  auto end1 = strSet1.cend();
-  auto begin2 = strSet2.cbegin();
-  auto end2 = strSet2.cend();
-  if (strSet1.size() < strSet2.size())
-  {
-    std::swap(begin1, begin2);
-    std::swap(end1, end2);
-  }
-
-  StringList results;
-  std::set_difference(begin1, end1, begin2, end2, std::front_inserter(results));
-
-  return results;
-};
 
 StringList ProcessData::unlovedChildrenNames() const
 {
@@ -186,8 +171,8 @@ StringList ProcessData::favouriteChildrenNames() const
   std::unordered_map<std::string, unsigned> aCount;
   for (const auto& childrenRelation : childrenRelations)
   {
-    const auto& nameReationSet = childrenRelation.second;
-    for (const auto& nameRelation : nameReationSet)
+    const auto& nameReations = childrenRelation.second;
+    for (const auto& nameRelation : nameReations)
     {
       if (bool inserted = !(aCount.emplace(nameRelation, 1)).second)
       {
