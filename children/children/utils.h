@@ -24,7 +24,7 @@ namespace utils
   template<typename Any>
   void printData(const Any& container)
   {
-    std::cout << "--------------" << std::endl;
+    std::cout << "\n--------------" << std::endl;
     for (const auto& item : container)
       printArgs(item, NEWLINE);
 

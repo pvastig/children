@@ -7,6 +7,9 @@ using namespace PavelA;
 
 namespace Test
 {
+int argc = 3;
+char* argv[3] = { "dummy", "test/names.dat", "test/children_relations.dat" };
+
 void printArgs()
 {
   utils::printArgs("Pavela ", 1, " test ", 2, '\n', "new line");
@@ -28,12 +31,7 @@ void readDataRelations()
 
 void unlovedChildrenList()
 {
-  int argc = 3;
-  char* argv[3] = { "dummy",
-                     "test/test_unloved_children_names.dat",
-                     "test/test_unloved_children_relations.dat" };
-  StringList comparedNames = { "Vasya", "Richard5", "Marina" };
-
+  StringList comparedNames = { "Vasya", "Marina", "Richard5"};
   ProcessData prData(argc, argv);
 
   utils::Time t;
@@ -46,17 +44,14 @@ void unlovedChildrenList()
   const auto size2 = std::distance(unlovedChildrenNames.cbegin(), unlovedChildrenNames.cend());
   assert(size1 == size2);
   for (auto it1 = comparedNames.cbegin(), it2 = unlovedChildrenNames.cbegin(); it1 != comparedNames.cend(); ++it1, ++it2)
+  {
     assert(*it1 == *it2);
+  }
 }
 
 void unhappyChildrenList()
 {
-  int argc = 3;
-  char* argv[3] = { "dummy",
-                     "test/test_unhappy_children_names.dat",
-                     "test/test_unhappy_children_relations.dat" };
-  StringList comparedNames{ "Vasya", "Marina", "Richard5" };
-
+  StringList comparedNames{ "Vasya" };
   ProcessData prData(argc, argv);
 
   utils::Time t;
@@ -70,18 +65,16 @@ void unhappyChildrenList()
   assert(size1 == size2);
 
   for (auto it1 = comparedNames.cbegin(), it2 = unhappyChildrenNames.cbegin(); it1 != comparedNames.cend(); ++it1, ++it2)
+  {
     assert(*it1 == *it2);
+  }
 }
 
 void favouriteChildrenList()
 {
-  int argc = 3;
-  char* argv[3] = { "dummy",
-                     "test/test_favourite_children_names.dat",
-                     "test/test_favourite_children_relations.dat" };
   StringList comparedNames{ "Masha", "Oleg" };
-
   ProcessData prData(argc, argv);
+
   utils::Time t;
   START;
   const auto favouriteChildrenNames = prData.favouriteChildrenNames();
@@ -93,7 +86,9 @@ void favouriteChildrenList()
   assert(size1 == size2);
 
   for (auto it1 = comparedNames.cbegin(), it2 = favouriteChildrenNames.cbegin(); it1 != comparedNames.cend(); ++it1, ++it2)
+  {
     assert(*it1 == *it2);
+  }
 }
 
 void all()

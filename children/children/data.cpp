@@ -43,7 +43,7 @@ void ChildrenRelations::read(const std::string& fileName)
 {
   std::ifstream ifs(fileName.c_str(), std::ios_base::in);
   if (!ifs.is_open())
-    throw std::invalid_argument("Error getting file:" + fileName);
+    throw std::invalid_argument("Error getting file: " + fileName);
 
   m_fileName = fileName;
   utils::printArgs(NEWLINE, "Reading data from ", m_fileName);
@@ -128,40 +128,53 @@ auto intersectSets = [](const auto& strSet1, const auto& strSet2)
 
 StringList ProcessData::unlovedChildrenNames() const
 {
-  const StringSet names(m_names.getData().cbegin(), m_names.getData().cend());
+  const auto& names = m_names.getData();
   const auto& childrenRelations = m_childrenRelations.getData();
-  StringSet namesRelations;
-  for (const auto& childrenRelation : childrenRelations)
+  StringList results;
+  for (const auto& name : names)
   {
-    const auto& nameReationSet = childrenRelation.second;
-    namesRelations.insert(nameReationSet.begin(), nameReationSet.end());
+    bool foundHappyName = false;
+    for (const auto& childrenRelation : childrenRelations)
+    {
+      const auto& nameReationSet = childrenRelation.second;
+      if (nameReationSet.find(name) != nameReationSet.end())
+      {
+        foundHappyName = true;
+          break;
+      }
+    }
+
+    if (!foundHappyName)
+      results.push_front(name);
   }
 
-  return intersectSets(names, namesRelations);
+  return results;
 }
 
 StringList ProcessData::unhappyChildrenNames() const
 {
   const auto& names = m_names.getData();
   const auto& childrenRelations = m_childrenRelations.getData();
-  StringList unhappyChildrenNames;
-  for (const auto& name : names)
+  StringList results;
+  for (const auto& item : childrenRelations)
   {
+    const auto& name = item.first;
     bool foundHappyName = false;
-    for (const auto& relationName : childrenRelations)
+    for (const auto& childrenName : childrenRelations)
     {
-      const auto foundName = relationName.second.find(name);
-      if (foundName != relationName.second.end())
+      const auto& nameReationSet = childrenName.second;
+      if (nameReationSet.find(name) != nameReationSet.end())
       {
         foundHappyName = true;
         break;
       }
     }
+
     if (!foundHappyName)
-      unhappyChildrenNames.push_front(name);
+      results.push_front(name);
   }
 
-  return unhappyChildrenNames;
+  return results;
 }
 
 StringList ProcessData::favouriteChildrenNames() const
