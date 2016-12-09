@@ -181,27 +181,25 @@ StringList ProcessData::favouriteChildrenNames() const
 {
   const auto& names = m_names.getData();
   const auto& childrenRelations = m_childrenRelations.getData();
-  //std::vector<std::pair<unsigned, std::string>> aCount;
-  //aCount.resize(names.size());
+  unsigned maxCount = 1;
+  StringList results;
   std::unordered_map<std::string, unsigned> aCount;
   for (const auto& childrenRelation : childrenRelations)
   {
     const auto& nameReationSet = childrenRelation.second;
     for (const auto& nameRelation : nameReationSet)
     {
-      if (bool inserted = !(aCount.emplace(nameRelation, 1).second))
-        ++aCount[nameRelation];
-    }
-  }
+      if (bool inserted = !(aCount.emplace(nameRelation, 1)).second)
+      {
+        auto& count = aCount[nameRelation];
+        ++count;
 
-  unsigned maxCount = 1;
-  StringList results;
-  for (const auto& count : aCount)
-  {
-    if (count.second > 1 && count.second >= maxCount)
-    {
-      maxCount = count.second;
-      results.push_front(count.first + ": " + std::to_string(count.second));
+        if (count > maxCount)
+        {
+          maxCount = count;
+          results.push_front(nameRelation + ": " + std::to_string(count));
+        }
+      }
     }
   }
 

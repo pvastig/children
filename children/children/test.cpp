@@ -72,7 +72,7 @@ void unhappyChildrenList()
 
 void favouriteChildrenList()
 {
-  StringList comparedNames{ "Masha", "Oleg" };
+  StringList comparedNames{ "Masha: 3", "Oleg: 2" };
   ProcessData prData(argc, argv);
 
   utils::Time t;

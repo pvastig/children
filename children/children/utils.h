@@ -27,15 +27,16 @@ namespace utils
     std::cout << "\n--------------" << std::endl;
     for (const auto& item : container)
       printArgs(item, NEWLINE);
-
     std::cout << "--------------" << std::endl;
   }
 
   template<typename Any>
   void printDataMap(const Any& container)
   {
+    std::cout << "\n--------------" << std::endl;
     for (const auto& item : container)
       printArgs(item.first, ' ', item.second, NEWLINE);
+    std::cout << "--------------" << std::endl;
   }
 
   class Time
