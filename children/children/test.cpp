@@ -4,6 +4,7 @@
 #include "test.h"
 
 using namespace PavelA;
+using namespace utils;
 
 namespace Test
 {
@@ -34,11 +35,10 @@ void unlovedChildrenList()
   StringList comparedNames = { "Vasya", "Marina", "Richard5"};
   ProcessData prData(argc, argv);
 
-  utils::Time t;
-  START;
+  START_TIME;
   const auto unlovedChildrenNames = prData.unlovedChildrenNames();
-  END;
-  utils::printArgs(NEWLINE, DURATION, NEWLINE);
+  STOP_TIME;
+  utils::printArgs(NEWLINE, DURATION_TIME, NEWLINE);
 
   const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
   const auto size2 = std::distance(unlovedChildrenNames.cbegin(), unlovedChildrenNames.cend());
@@ -54,11 +54,10 @@ void unhappyChildrenList()
   StringList comparedNames{ "Vasya" };
   ProcessData prData(argc, argv);
 
-  utils::Time t;
-  START;
+  START_TIME;
   const auto unhappyChildrenNames = prData.unhappyChildrenNames();
-  END;
-  utils::printArgs(NEWLINE, DURATION, NEWLINE);
+  STOP_TIME;
+  utils::printArgs(NEWLINE, DURATION_TIME, NEWLINE);
 
   const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
   const auto size2 = std::distance(unhappyChildrenNames.cbegin(), unhappyChildrenNames.cend());
@@ -75,11 +74,10 @@ void favouriteChildrenList()
   StringList comparedNames{ "Masha: 3", "Oleg: 2" };
   ProcessData prData(argc, argv);
 
-  utils::Time t;
-  START;
+  START_TIME;
   const auto favouriteChildrenNames = prData.favouriteChildrenNames();
-  END;
-  utils::printArgs(NEWLINE, DURATION, NEWLINE);
+  STOP_TIME;
+  utils::printArgs(NEWLINE, DURATION_TIME, NEWLINE);
   utils::printData(favouriteChildrenNames);
   const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
   const auto size2 = std::distance(favouriteChildrenNames.cbegin(), favouriteChildrenNames.cend());

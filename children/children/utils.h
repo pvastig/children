@@ -39,10 +39,10 @@ namespace utils
     std::cout << "--------------" << std::endl;
   }
 
-  class Time
+static class Timer
   {
   public:
-    Time()
+    Timer()
     {
     }
 
@@ -64,10 +64,10 @@ namespace utils
 
   private:
     std::chrono::time_point<std::chrono::system_clock> m_start, m_end;
-  };
+  }t;
 
-#define START t.start()
-#define END   t.end()
-#define DURATION t.duration()
+#define START_TIME    t.start()
+#define STOP_TIME     t.end()
+#define DURATION_TIME t.duration()
 }
 #endif // _utils_h_
