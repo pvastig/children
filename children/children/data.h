@@ -14,7 +14,7 @@ public:
   }
   virtual ~iData()
   {
-  };
+  }
   virtual void read(const std::string&) = 0;
   virtual void print() const = 0;
 
