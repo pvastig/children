@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _data_h__
-#define _data_h__
 
 #include <string>
 #include <unordered_map>
@@ -10,7 +8,7 @@
 #include <set>
 #include <map>
 
-namespace PavelA
+namespace pa
 {
 class iData
 {
@@ -73,7 +71,7 @@ private:
 class ProcessData
 {
 public:
-  ProcessData(const int argc, char ** const argv);
+  ProcessData(const int argc, const char ** argv);
   void run();
 
   ProcessData(ProcessData&) = delete;
@@ -88,11 +86,8 @@ public:
 
 private:
   const int m_argc;
-  char ** const m_argv;
+  const char ** m_argv;
   Names m_names;
   ChildrenRelations m_childrenRelations;
 };
 };
-
-#endif //_data_h__
-

@@ -4,13 +4,13 @@
 
 #include <cassert>
 
-using namespace PavelA;
+using namespace pa;
 using namespace utils;
 
 namespace Test
 {
-int argc = 3;
-char* argv[3] = { "dummy", "test/names.dat", "test/children_relations.dat" };
+constexpr int argc = 3;
+static char const * argv[] = { "dummy", "../tests/names.dat", "../tests/children_relations.dat" };
 
 void printArgs()
 {
@@ -20,14 +20,14 @@ void printArgs()
 void readDataNames()
 {
   Names dataNames;
-  dataNames.read("test/test_reading_names.dat");
+  dataNames.read("../tests/test_reading_names.dat");
   dataNames.print();
 }
 
 void readDataRelations()
 {
   ChildrenRelations dataRelations;
-  dataRelations.read("test/test_reading_relations.dat");
+  dataRelations.read("../tests/test_reading_relations.dat");
   dataRelations.print();
 }
 
@@ -39,7 +39,7 @@ void unlovedChildrenList()
   START_TIME;
   const auto unlovedChildrenNames = prData.unlovedChildrenNames();
   STOP_TIME;
-  utils::printArgs(NEWLINE, DURATION_TIME, NEWLINE);
+  utils::printArgs(DURATION_TIME);
 
   const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
   const auto size2 = std::distance(unlovedChildrenNames.cbegin(), unlovedChildrenNames.cend());
@@ -58,7 +58,7 @@ void unhappyChildrenList()
   START_TIME;
   const auto unhappyChildrenNames = prData.unhappyChildrenNames();
   STOP_TIME;
-  utils::printArgs(NEWLINE, DURATION_TIME, NEWLINE);
+  utils::printArgs(DURATION_TIME);
 
   const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
   const auto size2 = std::distance(unhappyChildrenNames.cbegin(), unhappyChildrenNames.cend());
@@ -78,7 +78,7 @@ void favouriteChildrenList()
   START_TIME;
   const auto favouriteChildrenNames = prData.favouriteChildrenNames();
   STOP_TIME;
-  utils::printArgs(NEWLINE, DURATION_TIME, NEWLINE);
+  utils::printArgs(DURATION_TIME);
   utils::printData(favouriteChildrenNames);
   const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
   const auto size2 = std::distance(favouriteChildrenNames.cbegin(), favouriteChildrenNames.cend());
@@ -92,10 +92,10 @@ void favouriteChildrenList()
 
 void all()
 {
-  Test::readDataNames();
-  Test::readDataRelations();
-  Test::unlovedChildrenList();
-  Test::unhappyChildrenList();
-  Test::favouriteChildrenList();
+  readDataNames();
+  readDataRelations();
+  unlovedChildrenList();
+  unhappyChildrenList();
+  favouriteChildrenList();
 }
 };

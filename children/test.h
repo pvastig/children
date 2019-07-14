@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _test_h__
-#define _test_h__
 
 namespace Test
 {
@@ -13,4 +11,3 @@ namespace Test
 
   void all();
 };
-#endif //_test_h__

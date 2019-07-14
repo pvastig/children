@@ -8,7 +8,7 @@ int main(int argc, char * argv[])
   std::ios::sync_with_stdio(false);
   try
   {
-    //PavelA::ProcessData prData(argc, argv);
+    //pa::ProcessData prData(argc, argv);
     //prData.run();
     //Test::printArgs();
     //Test::readDataNames();

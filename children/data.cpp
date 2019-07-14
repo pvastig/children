@@ -6,10 +6,11 @@
 #include <fstream>
 #include <sstream>
 
-namespace PavelA
+namespace pa
 {
 const std::string msgFinishedReading("Reading has been finished");
-const std::string msgPintedDataFromFile("**************** Printed data from file ");
+const std::string msgPintedFileData("**************** Printed data from file ");
+constexpr char const * const NEWLINE = "\n";
 
 void Names::read(const std::string& fileName)
 {
@@ -39,7 +40,7 @@ void Names::read(const std::string& fileName)
 
 void Names::print() const
 {
-  utils::printArgs(NEWLINE, msgPintedDataFromFile, m_fileName);
+  utils::printArgs(NEWLINE, msgPintedFileData, m_fileName);
   utils::printData(m_names);
 }
 
@@ -86,7 +87,7 @@ void ChildrenRelations::read(const std::string& fileName)
 
 void ChildrenRelations::print() const
 {
-  utils::printArgs(NEWLINE, msgPintedDataFromFile, m_fileName);
+  utils::printArgs(NEWLINE, msgPintedFileData, m_fileName);
   for (const auto& nameRelation : m_nameRelations)
   {
     const auto& names = nameRelation.second;
@@ -105,7 +106,7 @@ void ChildrenRelations::print() const
   }
 }
 
-ProcessData::ProcessData(const int argc, char ** const argv)
+ProcessData::ProcessData(const int argc, const char ** argv)
   : m_argc(argc), m_argv(argv)
 {
   if (argc != 3)
