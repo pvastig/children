@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0.0)
 project(children VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
+set(CMAKE_CXX_STANDARD 17)
 
 file(GLOB AUTO_SOURCES "*.cpp" "*.h")
 
