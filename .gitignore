@@ -38,6 +38,7 @@ $RECYCLE.BIN/
 # Directories potentially created on remote AFP share
 .AppleDB
 .AppleDesktop
+build
 Network Trash Folder
 Temporary Items
 .apdisk
@@ -63,5 +64,6 @@ Temporary Items
 *sdf
 *.props
 *.iobj
+*.txt.user
 /children/#Verone/incremental_index
 *.codeanalysis
