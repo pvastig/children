@@ -1,93 +1,84 @@
 #pragma once
 
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 #include <forward_list>
+#include <string>
+#include <string_view>
 #include <set>
 #include <map>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace pa
 {
-class iData
+class IData
 {
 public:
-  iData()
-  {
-  }
-  virtual ~iData()
-  {
-  }
-  virtual void read(const std::string&) = 0;
-  virtual void print() const = 0;
-
-  iData(const iData &) = delete;
-  iData & operator=(const iData &) = delete;
+    virtual ~IData();
+    virtual void read(std::string_view fileName) = 0;
+    virtual void print() const = 0;
 };
 
-class DataFile : public iData
+class DataFile : public IData
 {
 public:
-  virtual ~DataFile()
-  {
-  }
+    virtual ~DataFile();
+
 protected:
-  std::string m_fileName;
-  size_t m_countLines;
+    std::string m_fileName;
+    size_t m_countLines = 0;
 };
 
-using DataPtrArray = std::vector<iData*>;
-using StringList = std::forward_list<std::string>;
-using StringArray = std::vector<std::string>;
-using StringSet = std::set<std::string>;
+using DataArray      = std::vector<IData*>;
+using StringList     = std::forward_list<std::string>;
+//using StringArray    = std::vector<std::string>;
+using StringSet      = std::set<std::string>;
 using StringUnordSet = std::unordered_set<std::string>;
-using StringArrayMap = std::map<std::string, StringSet>;
-using StringArrayUnordMap = std::unordered_map<std::string, StringUnordSet>;
-using StringMap = std::map<std::string, size_t>;
+using StringMap      = std::map<std::string, StringSet>;
+using StringUnordMap = std::unordered_map<std::string, StringUnordSet>;
 
-class Names : public DataFile
+class ChildrenNames : public DataFile
 {
 public:
-  void read(const std::string& fileName) override;
-  void print() const override;
-  const StringUnordSet& getData() const { return m_names; }
+    void read(std::string_view fileName) override;
+    void print() const override;
+    StringUnordSet const & childrenNames() const { return m_childrenNames; }
 
 private:
-  StringUnordSet m_names;
+    StringUnordSet m_childrenNames;
 };
 
 class ChildrenRelations : public DataFile
 {
 public:
-  void read(const std::string& fileNameIn);
-  void print() const override;
-  const StringArrayUnordMap& getData() const { return m_nameRelations; }
+    void read(std::string_view fileName) override;
+    void print() const override;
+    StringUnordMap const & name2Relations() const { return m_name2Relations; }
 
 private:
-  StringArrayUnordMap m_nameRelations;
+    StringUnordMap m_name2Relations;
 };
 
-class ProcessData
+class ProcessDataFacade
 {
 public:
-  ProcessData(const int argc, const char ** argv);
-  void run();
+    ProcessDataFacade(int argc, char ** argv);
+    void run();
 
-  ProcessData(ProcessData&) = delete;
-  ProcessData & operator=(ProcessData&) = delete;
+    ProcessDataFacade(ProcessDataFacade&) = delete;
+    ProcessDataFacade & operator=(ProcessDataFacade&) = delete;
 
-  //1 list of unloved children
-  StringList unlovedChildrenNames() const;
-  //2 list of unhappy children
-  StringList unhappyChildrenNames() const;
-  //3 list of favorite children
-  StringList favouriteChildrenNames() const;
+    //1 list of unloved children
+    StringList unlovedChildrenNames() const;
+    //2 list of unhappy children
+    StringList unhappyChildrenNames() const;
+    //3 list of favorite children
+    StringList favouriteChildrenNames() const;
 
 private:
-  const int m_argc;
-  const char ** m_argv;
-  Names m_names;
-  ChildrenRelations m_childrenRelations;
+    int const m_argc;
+    char ** m_argv;
+    ChildrenNames m_childrenNames;
+    ChildrenRelations m_childrenRelations;
 };
 };

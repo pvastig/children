@@ -15,26 +15,27 @@ void printArgs(Any&& arg)
 }
 
 template<class Any, typename... Args>
-void printArgs(Any&& first, Args&&... args)
+void printArgs(Any first, Args&&... args)
 {
     std::cout << std::forward<Any>(first);
     printArgs(args...);
 }
 
 template<typename Any>
-void printData(const Any& container)
+void printContainerData(Any container)
 {
     PRINT_DASHED_LINE;
-    for (const auto& item : container)
+    for (auto const & item : container)
         printArgs(item, newLine);
     PRINT_DASHED_LINE;
 }
 
+//TODO: make overload of m
 template<typename Any>
-void printDataMap(const Any& container)
+void printDataMap(Any container)
 {
     PRINT_DASHED_LINE;
-    for (const auto& item : container)
+    for (auto const & item : container)
         printArgs(item.first, ' ', item.second, newLine);
     PRINT_DASHED_LINE;
 }
@@ -42,9 +43,7 @@ void printDataMap(const Any& container)
 static class Timer
 {
 public:
-    Timer()
-    {
-    }
+    Timer() = default;
 
     void start()
     {
@@ -58,7 +57,7 @@ public:
 
     auto duration() const
     {
-        auto duration = m_end - m_start;
+        auto const duration = m_end - m_start;
         return duration.count();
     }
 
