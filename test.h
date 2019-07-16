@@ -2,12 +2,12 @@
 
 namespace Test
 {
-  void printArgs();
+  void printCmdArgs();
   void readDataNames();
   void readDataRelations();
-  void unlovedChildrenList();
-  void unhappyChildrenList();
-  void favouriteChildrenList();
+  void unlovedChildren();
+  void unhappyChildren();
+  void favouriteChildren();
 
   void all();
 };

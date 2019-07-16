@@ -15,7 +15,7 @@ void printArgs(Any&& arg)
 }
 
 template<class Any, typename... Args>
-void printArgs(Any first, Args&&... args)
+void printArgs(Any&& first, Args&&... args)
 {
     std::cout << std::forward<Any>(first);
     printArgs(args...);
@@ -30,7 +30,7 @@ void printContainerData(Any container)
     PRINT_DASHED_LINE;
 }
 
-//TODO: make overload of m
+//TODO: make overload of template
 template<typename Any>
 void printDataMap(Any container)
 {

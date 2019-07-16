@@ -8,41 +8,35 @@ int main(int argc, char * argv[])
   std::ios::sync_with_stdio(false);
   try
   {
-    //pa::ProcessData prData(argc, argv);
+    //pa::ProcessDataFacade prData(argc, argv);
     //prData.run();
     //Test::printArgs();
     //Test::readDataNames();
     //Test::readDataRelations();
-    //Test::unlovedChildrenList();
-    //Test::unhappyChildrenList();
-    //Test::favouriteChildrenList();
-    Test::all();
+    //Test::unlovedChildren();
+    //Test::unhappyChildren();
+    //Test::favouriteChildren();
+    //Test::all();
     return 0;
   }
-  catch (const std::invalid_argument& e)
+  catch (std::invalid_argument const & e)
   {
     std::cerr << "Invalid argument: " << e.what();
-    return 1;
   }
-  catch (const std::bad_cast& e)
-  {
-    std::cerr << "bad_cast: " << e.what();
-    return 1;
-  }
-  catch (const std::bad_alloc& e)
+  catch (std::bad_alloc const & e)
   {
     std::cerr << "bad_alloc: " << e.what();
-    return 1;
   }
   catch (const std::exception& e)
   {
     std::cerr << "exception: " << e.what();
-    return 1;
   }
   catch (...)
   {
     std::cerr << "Unknown error";
-    return 1;
   }
+
+  std::cout << std::endl;
+  return 1;
 }
 
