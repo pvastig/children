@@ -33,7 +33,7 @@ void ChildrenNames::read(std::string_view fileName)
             continue;
         }
 
-        if (bool inserted = !m_childrenNames.insert(line).second)
+        if (auto [it, inserted] = m_childrenNames.insert(line);!inserted)
         {
             //utils::printArgs(m_countLines, " duplicated data : ", line);
         }
@@ -100,7 +100,7 @@ ProcessDataFacade::ProcessDataFacade(int argc, char ** argv)
         throw std::invalid_argument(childrenFilePath.data());
 
     std::string_view childrenRelationsFilePath = argv[2];
-    if (wrongFilePath(argv[2]))
+    if (wrongFilePath(childrenRelationsFilePath))
         throw std::invalid_argument(childrenRelationsFilePath.data());
 
     //TODO: try to parallel task
