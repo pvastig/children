@@ -131,51 +131,39 @@ StringList ProcessDataFacade::unlovedChildrenNames() const
 StringList ProcessDataFacade::unhappyChildrenNames() const
 {
     auto const & name2Relations = m_childrenRelations.name2Relations();
-    StringList results;
-    for (auto const & [childrenName, nameReationSet] : name2Relations)
+    auto foundHappyName = [&name2Relations](auto const & childrenName)
     {
-        bool foundHappyName = false;
         for (auto const & [dummy, name2Relation] : name2Relations)
-        {
             if (name2Relation.find(childrenName) != name2Relation.cend())
-            {
-                foundHappyName = true;
-                break;
-            }
-        }
-
-        if (!foundHappyName)
+                return true;
+        return false;
+    };
+    StringList results;
+    for (auto const & [childrenName, dummy] : name2Relations)
+    {
+        if (!foundHappyName(childrenName))
             results.push_front(childrenName);
     }
-
     return results;
 }
 
 StringList ProcessDataFacade::favouriteChildrenNames() const
 {
+    //TODO: improve name of variables
     auto const & name2Relations = m_childrenRelations.name2Relations();
-    unsigned maxCount = 1;
-    StringList results;
-    std::unordered_map<std::string, unsigned> aCount;
-    for (auto const & childrenRelation : name2Relations)
+    std::unordered_map<std::string, size_t> nameToCount;
+    for (auto const & [dummy, name2Relation] : name2Relations)
     {
-        const auto& nameReations = childrenRelation.second;
-        for (const auto& nameRelation : nameReations)
-        {
-            if (bool inserted = !(aCount.emplace(nameRelation, 1)).second)
-            {
-                auto& count = aCount[nameRelation];
-                ++count;
-
-                if (count > maxCount)
-                {
-                    maxCount = count;
-                    results.push_front(nameRelation + ": " + std::to_string(count));
-                }
-            }
-        }
+        for (auto const & nameRelation : name2Relation)
+            ++nameToCount[nameRelation];
     }
-
+    size_t const countFilter = 1;
+    StringList results;
+    for (auto const & [name, count] : nameToCount)
+    {
+        if (count > countFilter)
+            results.push_front(name + ": " + std::to_string(count));
+    }
     return results;
 }
 
@@ -187,7 +175,7 @@ void ProcessDataFacade::run()
         eUnlovedChildrenNames,
         eUnhappyChildrenNames,
         eFavouriteChildrenNames,
-    };
+        };
 
     const std::string_view menu = R"(
 Select action:"

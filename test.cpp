@@ -11,7 +11,7 @@ namespace Test
 {
 constexpr int argc = 3;
 static char * argv[] = { "dummy", "../tests/names.dat", "../tests/children_relations.dat" };
-#define PRINT_DURATION_TIME  printArgs(DURATION_TIME, utils::newLine)
+#define PRINT_DURATION_TIME  printArgs("Elapsed time: ", DURATION_TIME, utils::newLine)
 
 void printCmdArgs()
 {
@@ -78,6 +78,7 @@ void favouriteChildren()
     const auto favouriteChildrenNames = prData.favouriteChildrenNames();
     STOP_TIME;
     PRINT_DURATION_TIME;
+
     utils::printContainerData(favouriteChildrenNames);
     const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
     const auto size2 = std::distance(favouriteChildrenNames.cbegin(), favouriteChildrenNames.cend());
