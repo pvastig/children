@@ -11,7 +11,7 @@ namespace Test
 {
 constexpr int argc = 3;
 static char * argv[] = { "dummy", "../names.dat", "../children_relations.dat" };
-#define PRINT_DURATION_TIME  printArgs("Elapsed time: ", DURATION_TIME, utils::newLine)
+#define PRINT_DURATION_TIME  printArgs("elapsed time: ", DURATION_TIME, utils::newLine)
 
 void printCmdArgs()
 {
@@ -32,6 +32,7 @@ void readDataRelations()
 
 void unlovedChildren()
 {
+    printArgs("unlovedChildren: ");
     StringList comparedNames = { "Marina", "Richard5", "Vasya" };
     ProcessDataFacade prData(argc, argv);
 
@@ -51,6 +52,7 @@ void unlovedChildren()
 
 void unhappyChildren()
 {
+    printArgs("unhappyChildren: ");
     StringList comparedNames{ "Vasya" };
     ProcessDataFacade prData(argc, argv);
 
@@ -71,6 +73,7 @@ void unhappyChildren()
 
 void favouriteChildren()
 {
+    printArgs("favouriteChildren: ");
     StringList comparedNames{ "Masha: 3", "Oleg: 2" };
     ProcessDataFacade prData(argc, argv);
 
@@ -79,7 +82,6 @@ void favouriteChildren()
     STOP_TIME;
     PRINT_DURATION_TIME;
 
-    utils::printContainerData(favouriteChildrenNames);
     const auto size1 = std::distance(comparedNames.cbegin(), comparedNames.cend());
     const auto size2 = std::distance(favouriteChildrenNames.cbegin(), favouriteChildrenNames.cend());
     assert(size1 == size2);
