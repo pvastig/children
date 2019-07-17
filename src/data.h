@@ -8,17 +8,12 @@
 
 namespace pa
 {
-class IData
-{
-public:
-    virtual ~IData();
-    virtual void read(std::string_view fileName) = 0;
-};
 
-class DataFile : public IData
+class DataFile
 {
 public:
     virtual ~DataFile();
+    virtual void read(std::string_view fileName) = 0;
 
 protected:
     std::string m_fileName;
@@ -53,7 +48,7 @@ class ProcessDataFacade
 {
 public:
     ProcessDataFacade(int argc, char ** argv);
-    void run();
+    void run() const;
 
     ProcessDataFacade(ProcessDataFacade&) = delete;
     ProcessDataFacade & operator=(ProcessDataFacade&) = delete;

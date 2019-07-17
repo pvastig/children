@@ -1,6 +1,6 @@
-#include"data.h"
+#include"../src/data.h"
 #include "test.h"
-#include "utils.h"
+#include "../src/utils.h"
 
 #include <cassert>
 
@@ -10,7 +10,7 @@ using namespace utils;
 namespace Test
 {
 constexpr int argc = 3;
-static char * argv[] = { "dummy", "../tests/names.dat", "../tests/children_relations.dat" };
+static char * argv[] = { "dummy", "../names.dat", "../children_relations.dat" };
 #define PRINT_DURATION_TIME  printArgs("Elapsed time: ", DURATION_TIME, utils::newLine)
 
 void printCmdArgs()
@@ -21,13 +21,13 @@ void printCmdArgs()
 void readDataNames()
 {
     ChildrenNames childrenNames;
-    childrenNames.read("../tests/test_reading_names.dat");
+    childrenNames.read("../test_reading_names.dat");
 }
 
 void readDataRelations()
 {
     ChildrenRelations childrenRelations;
-    childrenRelations.read("../tests/test_reading_relations.dat");
+    childrenRelations.read("../test_reading_relations.dat");
 }
 
 void unlovedChildren()

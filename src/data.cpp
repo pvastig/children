@@ -10,7 +10,6 @@ namespace pa {
 constexpr char const * const msgFinishedReading("Reading has been finished");
 
 DataFile::~DataFile() = default;
-IData::~IData() = default;
 
 //TODO: add logging to file
 void ChildrenNames::read(std::string_view fileName)
@@ -167,21 +166,21 @@ StringList ProcessDataFacade::favouriteChildrenNames() const
     return results;
 }
 
-void ProcessDataFacade::run()
+void ProcessDataFacade::run() const
 {
-    enum class eUserSelect : char
+    enum class UserSelect : char
     {
-        eExit,
-        eUnlovedChildrenNames,
-        eUnhappyChildrenNames,
-        eFavouriteChildrenNames,
-        };
+        Exit,
+        UnlovedChildrenNames,
+        UnhappyChildrenNames,
+        FavouriteChildrenNames
+    };
 
     const std::string_view menu = R"(
 Select action:"
-    "1 - unloved children"
-    "2 - unhappy children"
-    "3 - favorite children"
+    "1 - Unloved children"
+    "2 - Unhappy children"
+    "3 - Favorite children"
     "------------------------"
     "0 - exit"
 ===> )";
@@ -200,18 +199,18 @@ Select action:"
             std::cin >> s;
             num = -1;
         }
-        switch (static_cast<eUserSelect>(num))
+        switch (static_cast<UserSelect>(num))
         {
-        case eUserSelect::eUnlovedChildrenNames:
+        case UserSelect::UnlovedChildrenNames:
             utils::printContainerData(unlovedChildrenNames());
             break;
-        case eUserSelect::eUnhappyChildrenNames:
+        case UserSelect::UnhappyChildrenNames:
             utils::printContainerData(unhappyChildrenNames());
             break;
-        case eUserSelect::eFavouriteChildrenNames:
+        case UserSelect::FavouriteChildrenNames:
             utils::printContainerData(favouriteChildrenNames());
             break;
-        case eUserSelect::eExit:
+        case UserSelect::Exit:
             utils::printArgs("Bye-bye :)");
             readAgain = false;
             break;
