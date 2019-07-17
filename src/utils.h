@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <iostream>
 
@@ -21,7 +22,7 @@ void printArgs(Any&& first, Args&&... args)
     printArgs(args...);
 }
 
-template<typename Any>
+template<class Any>
 void printContainerData(Any&& container)
 {
     PRINT_DASHED_LINE;
@@ -31,13 +32,35 @@ void printContainerData(Any&& container)
 }
 
 //TODO: make overload of template
-template<typename Any>
+template<class Any>
 void printDataMap(Any container)
 {
     PRINT_DASHED_LINE;
-    for (auto const & item : container)
-        printArgs(item.first, ' ', item.second, newLine);
+    for (auto const & [first, second] : container)
+        printArgs(first, ' ', second, newLine);
     PRINT_DASHED_LINE;
+}
+
+//TODO: improve template
+template<class Any>
+void printComplexContainer(Any container)
+{
+    for (auto const & nameRelation : container)
+    {
+        const auto& names = nameRelation.second;
+        if (names.empty())
+            continue;
+
+        const auto& firstName = nameRelation.first;
+        const auto& firstRelationName = names.begin();
+        utils::printArgs(firstName, '\t', *firstRelationName, utils::newLine);
+        std::for_each(std::next(names.begin()), names.end(),
+                      [](const auto& relationName)
+                      {
+                          utils::printArgs('\t', relationName, utils::newLine);
+                      }
+                      );
+    }
 }
 
 static class Timer

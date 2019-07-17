@@ -2,7 +2,6 @@
 
 namespace Test
 {
-  void printCmdArgs();
   void readDataNames();
   void readDataRelations();
   void unlovedChildren();

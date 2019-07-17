@@ -111,10 +111,9 @@ StringList ProcessDataFacade::unlovedChildrenNames() const
     };
     StringList result;
     for (auto const & childrenName : chilrenNames)
-    {
         if (!foundHappyName(childrenName))
             result.push_front(childrenName);
-    }
+
     return result;
 }
 
@@ -130,10 +129,9 @@ StringList ProcessDataFacade::unhappyChildrenNames() const
     };
     StringList results;
     for (auto const & [childrenName, dummy] : name2Relations)
-    {
         if (!foundHappyName(childrenName))
             results.push_front(childrenName);
-    }
+
     return results;
 }
 
@@ -142,17 +140,14 @@ StringList ProcessDataFacade::favouriteChildrenNames() const
     auto const & name2RelatedNames = m_childrenRelations.name2RelatedNames();
     std::unordered_map<std::string, size_t> favoriteName2Count;
     for (auto const & [dummy, relatedNames] : name2RelatedNames)
-    {
         for (auto const & relatedName : relatedNames)
             ++favoriteName2Count[relatedName];
-    }
-    size_t const filter = 1;
+
     StringList results;
     for (auto const & [name, count] : favoriteName2Count)
-    {
-        if (count > filter)
+        if (size_t const filter = 1; count > filter)
             results.push_front(name + ": " + std::to_string(count));
-    }
+
     return results;
 }
 
