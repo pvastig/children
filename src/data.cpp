@@ -7,8 +7,6 @@
 #include <fstream>
 
 namespace pa {
-constexpr char const * const msgFinishedReading("Reading has been finished");
-
 DataFile::~DataFile() = default;
 
 //TODO: add logging to file
@@ -19,7 +17,6 @@ void ChildrenNames::read(std::string_view fileName)
     if (!ifs.is_open())
         throw std::invalid_argument("Error getting file " + m_fileName);
 
-    utils::printArgs("Reading data from ", m_fileName);
     std::string line;
     while (std::getline(ifs, line))
     {
@@ -37,8 +34,6 @@ void ChildrenNames::read(std::string_view fileName)
             //utils::printArgs(m_countLines, " duplicated data : ", line);
         }
     }
-
-    utils::printArgs(utils::newLine, msgFinishedReading, utils::newLine);
 }
 
 void ChildrenRelations::read(std::string_view fileName)
@@ -47,8 +42,6 @@ void ChildrenRelations::read(std::string_view fileName)
     m_fileName = fileName;
     if (!ifs.is_open())
         throw std::invalid_argument("Error getting file: " + m_fileName);
-
-    utils::printArgs("Reading data from ", m_fileName);
 
     std::string line;
     std::istringstream iss(line);
@@ -79,8 +72,6 @@ void ChildrenRelations::read(std::string_view fileName)
 
         m_name2RelatedNames[word1].insert(word2);
     }
-
-    utils::printArgs(utils::newLine, msgFinishedReading, utils::newLine);
 }
 
 ProcessDataFacade::ProcessDataFacade(int argc, char ** argv)
@@ -210,11 +201,11 @@ Select action:"
             utils::printContainerData(favouriteChildrenNames());
             break;
         case UserSelect::Exit:
-            utils::printArgs("Bye-bye :)");
+            utils::printArgs("Bye-bye :)", utils::newLine);
             readAgain = false;
             break;
         default:
-            utils::printArgs("You entered not existed action, please, try again :)");
+            utils::printArgs("You entered not existed action, please, try again :)", utils::newLine);
             break;
         }
     } while (readAgain);

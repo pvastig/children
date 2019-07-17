@@ -22,10 +22,10 @@ void printArgs(Any&& first, Args&&... args)
 }
 
 template<typename Any>
-void printContainerData(Any container)
+void printContainerData(Any&& container)
 {
     PRINT_DASHED_LINE;
-    for (auto const & item : container)
+    for (auto const & item : std::forward<Any>(container))
         printArgs(item, newLine);
     PRINT_DASHED_LINE;
 }
