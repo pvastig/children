@@ -38,10 +38,10 @@ class ChildrenRelations : public DataFile
 {
 public:
     void read(std::string_view fileName) override;
-    StringUnordMap const & name2Relations() const { return m_name2Relations; }
+    StringUnordMap const & name2RelatedNames() const { return m_name2RelatedNames; }
 
 private:
-    StringUnordMap m_name2Relations;
+    StringUnordMap m_name2RelatedNames;
 };
 
 class ProcessDataFacade
@@ -49,9 +49,6 @@ class ProcessDataFacade
 public:
     ProcessDataFacade(int argc, char ** argv);
     void run() const;
-
-    ProcessDataFacade(ProcessDataFacade&) = delete;
-    ProcessDataFacade & operator=(ProcessDataFacade&) = delete;
 
     //list of unloved children
     StringList unlovedChildrenNames() const;

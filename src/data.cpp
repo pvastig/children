@@ -77,7 +77,7 @@ void ChildrenRelations::read(std::string_view fileName)
             continue;
         }
 
-        m_name2Relations[word1].insert(word2);
+        m_name2RelatedNames[word1].insert(word2);
     }
 
     utils::printArgs(utils::newLine, msgFinishedReading, utils::newLine);
@@ -110,7 +110,7 @@ ProcessDataFacade::ProcessDataFacade(int argc, char ** argv)
 StringList ProcessDataFacade::unlovedChildrenNames() const
 {
     auto const & chilrenNames   = m_childrenNames.childrenNames();
-    auto const & name2Relations = m_childrenRelations.name2Relations();
+    auto const & name2Relations = m_childrenRelations.name2RelatedNames();
     auto foundHappyName = [&name2Relations](auto const & childrenName)
     {
         for (auto const & [dummy, name2Relation] : name2Relations)
@@ -129,7 +129,7 @@ StringList ProcessDataFacade::unlovedChildrenNames() const
 
 StringList ProcessDataFacade::unhappyChildrenNames() const
 {
-    auto const & name2Relations = m_childrenRelations.name2Relations();
+    auto const & name2Relations = m_childrenRelations.name2RelatedNames();
     auto foundHappyName = [&name2Relations](auto const & childrenName)
     {
         for (auto const & [dummy, name2Relation] : name2Relations)
@@ -148,19 +148,18 @@ StringList ProcessDataFacade::unhappyChildrenNames() const
 
 StringList ProcessDataFacade::favouriteChildrenNames() const
 {
-    //TODO: improve name of variables
-    auto const & name2Relations = m_childrenRelations.name2Relations();
-    std::unordered_map<std::string, size_t> nameToCount;
-    for (auto const & [dummy, name2Relation] : name2Relations)
+    auto const & name2RelatedNames = m_childrenRelations.name2RelatedNames();
+    std::unordered_map<std::string, size_t> favoriteName2Count;
+    for (auto const & [dummy, relatedNames] : name2RelatedNames)
     {
-        for (auto const & nameRelation : name2Relation)
-            ++nameToCount[nameRelation];
+        for (auto const & relatedName : relatedNames)
+            ++favoriteName2Count[relatedName];
     }
-    size_t const countFilter = 1;
+    size_t const filter = 1;
     StringList results;
-    for (auto const & [name, count] : nameToCount)
+    for (auto const & [name, count] : favoriteName2Count)
     {
-        if (count > countFilter)
+        if (count > filter)
             results.push_front(name + ": " + std::to_string(count));
     }
     return results;
