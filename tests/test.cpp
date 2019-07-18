@@ -24,7 +24,7 @@ void compareContainers(T1 referenceContainer, T2 comparedContainer, int lineErro
     for (auto it1 = referenceContainer.cbegin(), it2 = comparedContainer.cbegin(); it1 != referenceContainer.cend(); ++it1, ++it2)
     {
         if (*it1 != *it2)
-            throw std::length_error("Line: "             + std::to_string(lineError) +
+            throw std::logic_error("Line: "              + std::to_string(lineError) +
                                     ". Reference name: " + *it1                      +
                                     ". Compared name: "  + *it2);
     }

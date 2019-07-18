@@ -27,6 +27,7 @@ int main(int argc, char * argv[])
         std::cerr << "Unknown error";
     }
 
+    std::cout << std::endl;
     return 1;
 }
 
