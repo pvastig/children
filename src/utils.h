@@ -23,7 +23,7 @@ void printArgs(Any&& first, Args&&... args)
 }
 
 template<class Any>
-void printContainerData(Any&& container)
+void printContainer(Any&& container)
 {
     PRINT_DASHED_LINE;
     for (auto const & item : std::forward<Any>(container))
@@ -85,7 +85,7 @@ public:
     }
 
 private:
-    std::chrono::time_point<std::chrono::system_clock> m_start, m_end;
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_start, m_end;
 }t;
 
 #define START_TIME    t.start()

@@ -100,7 +100,7 @@ ProcessDataFacade::ProcessDataFacade(int argc, char ** argv)
 
 StringList ProcessDataFacade::unlovedChildrenNames() const
 {
-    auto const & chilrenNames   = m_childrenNames.childrenNames();
+    auto const & chilrenNames   = m_childrenNames.names();
     auto const & name2Relations = m_childrenRelations.name2RelatedNames();
     auto foundHappyName = [&name2Relations](auto const & childrenName)
     {
@@ -187,13 +187,13 @@ Select action:"
         switch (static_cast<UserSelect>(num))
         {
         case UserSelect::UnlovedChildrenNames:
-            utils::printContainerData(unlovedChildrenNames());
+            utils::printContainer(unlovedChildrenNames());
             break;
         case UserSelect::UnhappyChildrenNames:
-            utils::printContainerData(unhappyChildrenNames());
+            utils::printContainer(unhappyChildrenNames());
             break;
         case UserSelect::FavouriteChildrenNames:
-            utils::printContainerData(favouriteChildrenNames());
+            utils::printContainer(favouriteChildrenNames());
             break;
         case UserSelect::Exit:
             utils::printArgs("Bye-bye :)", utils::newLine);

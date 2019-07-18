@@ -28,7 +28,7 @@ class ChildrenNames : public DataFile
 {
 public:
     void read(std::string_view fileName) override;
-    StringUnordSet const & childrenNames() const { return m_childrenNames; }
+    StringUnordSet const & names() const { return m_childrenNames; }
 
 private:
     StringUnordSet m_childrenNames;

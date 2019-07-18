@@ -18,7 +18,7 @@ int main(int argc, char * argv[])
     {
         std::cerr << "bad_alloc: " << e.what();
     }
-    catch (const std::exception& e)
+    catch (std::exception const & e)
     {
         std::cerr << "exception: " << e.what();
     }
@@ -27,7 +27,6 @@ int main(int argc, char * argv[])
         std::cerr << "Unknown error";
     }
 
-    std::cout << std::endl;
     return 1;
 }
 
