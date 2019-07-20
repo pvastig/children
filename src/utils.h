@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <chrono>
 #include <iostream>
+#include <string_view>
 
 namespace utils
 {
@@ -18,6 +19,7 @@ void printArgs(Any&& arg)
 template<class Any, typename... Args>
 void printArgs(Any&& first, Args&&... args)
 {
+    std::ios::sync_with_stdio(false);
     std::cout << std::forward<Any>(first);
     printArgs(args...);
 }
@@ -47,48 +49,55 @@ void printComplexContainer(Any container)
 {
     for (auto const & nameRelation : container)
     {
-        const auto& names = nameRelation.second;
+        const auto & names = nameRelation.second;
         if (names.empty())
             continue;
 
-        const auto& firstName = nameRelation.first;
-        const auto& firstRelationName = names.begin();
-        utils::printArgs(firstName, '\t', *firstRelationName, utils::newLine);
-        std::for_each(std::next(names.begin()), names.end(),
-                      [](const auto& relationName)
+        const auto & firstName = nameRelation.first;
+        const auto & firstRelationName = names.begin();
+        printArgs(firstName, '\t', *firstRelationName, newLine);
+        std::for_each(std::next(names.cbegin()), names.cend(),
+                      [](const auto & relationName)
                       {
-                          utils::printArgs('\t', relationName, utils::newLine);
+                          printArgs('\t', relationName, utils::newLine);
                       }
                       );
     }
 }
 
-static class Timer
+template<class T>
+class Singleton
 {
 public:
-    Timer() = default;
-
-    void start()
+    static T & instance()
     {
-        m_start = std::chrono::system_clock::now();
+        static T object;
+        return object;
     }
+};
 
-    void end()
-    {
-        m_end = std::chrono::system_clock::now();
-    }
-
-    auto duration() const
-    {
-        auto const duration = m_end - m_start;
-        return duration.count();
-    }
+class Timer final : public Singleton<Timer>
+{
+public:
+    Timer();
+    void start();
+    void end();
+    long duration() const;
 
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> m_start, m_end;
-}t;
+};
 
-#define START_TIME    t.start()
-#define STOP_TIME     t.end()
-#define DURATION_TIME t.duration()
+#define START_TIME    Timer::instance().start()
+#define STOP_TIME     Timer::instance().end()
+#define DURATION_TIME Timer::instance().duration()
+
+class Log final : public Singleton<Log>
+{
+public:
+    void setFileName(std::string_view fileName);
+    Log & operator<<(std::string_view str);
+private:
+    std::string m_fileName;
+};
 }

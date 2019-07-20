@@ -124,6 +124,14 @@ void favouriteChildren()
     compareContainers(referenceNames, favouriteChildrenNames, __LINE__);
 }
 
+//TODO: improve test
+void testLog()
+{
+    auto & log = Log::instance();
+    log.setFileName("testLog.log");
+    log << "this is big test";
+}
+
 void all()
 {
     readDataNames();

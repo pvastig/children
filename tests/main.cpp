@@ -6,12 +6,14 @@ int main()
 {
     try
     {
-        //Test::readDataNames();
-        //Test::readDataRelations();
-        //Test::unlovedChildren();
-        //Test::unhappyChildren();
-        //Test::favouriteChildren();
-        Test::all();
+        using namespace Test;
+        //readDataNames();
+        //readDataRelations();
+        //unlovedChildren();
+        //unhappyChildren();
+        //favouriteChildren();
+        all();
+        //testLog();
         return 0;
     }
     catch (const std::exception& e)
