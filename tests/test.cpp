@@ -48,7 +48,7 @@ void readDataNames()
 
 void readDataRelations()
 {
-    printArgs("readDataNames: ");
+    printArgs("readDataRelations: ");
     ChildrenRelations childrenRelations;
 
     START_TIME;
@@ -127,7 +127,7 @@ void favouriteChildren()
 //TODO: improve test
 void testLog()
 {
-    auto & log = Log::instance();
+    auto & log = LogToFile::instance();
     log.setFileName("testLog.log");
     log << "this is big test";
 }

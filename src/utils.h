@@ -76,10 +76,9 @@ public:
     }
 };
 
-class Timer final : public Singleton<Timer>
+class Timer
 {
 public:
-    Timer();
     void start();
     void end();
     long duration() const;
@@ -88,11 +87,11 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> m_start, m_end;
 };
 
-#define START_TIME    Timer::instance().start()
-#define STOP_TIME     Timer::instance().end()
-#define DURATION_TIME Timer::instance().duration()
+#define START_TIME    Singleton<Timer>::instance().start()
+#define STOP_TIME     Singleton<Timer>::instance().end()
+#define DURATION_TIME Singleton<Timer>::instance().duration()
 
-class Log final : public Singleton<Log>
+class Log
 {
 public:
     void setFileName(std::string_view fileName);
@@ -100,4 +99,5 @@ public:
 private:
     std::string m_fileName;
 };
+using LogToFile = Singleton<Log>;
 }
