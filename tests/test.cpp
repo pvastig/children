@@ -32,7 +32,7 @@ void compareContainers(T1 referenceContainer, T2 comparedContainer, int lineErro
 
 void readDataNames()
 {
-    printArgs("readDataNames: ");
+    printArgs(__func__);
     ChildrenNames names;
 
     START_TIME;
@@ -48,7 +48,7 @@ void readDataNames()
 
 void readDataRelations()
 {
-    printArgs("readDataRelations: ");
+    printArgs(__func__);
     ChildrenRelations childrenRelations;
 
     START_TIME;
@@ -84,7 +84,7 @@ void readDataRelations()
 
 void unlovedChildren()
 {
-    printArgs("unlovedChildren: ");
+    printArgs(__func__);
     StringList const referenceNames = { "Marina", "Richard5", "Vasya" };
     ProcessDataFacade prData(argc, argv);
 
@@ -98,7 +98,7 @@ void unlovedChildren()
 
 void unhappyChildren()
 {
-    printArgs("unhappyChildren: ");
+    printArgs(__func__);
     StringList const referenceNames{ "Vasya" };
     ProcessDataFacade prData(argc, argv);
 
@@ -112,7 +112,7 @@ void unhappyChildren()
 
 void favouriteChildren()
 {
-    printArgs("favouriteChildren: ");
+    printArgs(__func__);
     StringList const referenceNames{ "Masha: 3", "Oleg: 2" };
     ProcessDataFacade prData(argc, argv);
 
@@ -127,9 +127,8 @@ void favouriteChildren()
 //TODO: improve test
 void testLog()
 {
-    auto & log = LogToFile::instance();
-    log.setFileName("testLog.log");
-    log << "this is big test";
+    LOG.setFileName("testLog.log");
+    LOG << "this is big test";
 }
 
 void all()

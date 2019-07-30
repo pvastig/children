@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <string_view>
 
@@ -95,9 +96,21 @@ class Log
 {
 public:
     void setFileName(std::string_view fileName);
-    Log & operator<<(std::string_view str);
+    template<class T>
+    Log & operator<<(T msg);
 private:
     std::string m_fileName;
 };
-using LogToFile = Singleton<Log>;
+
+//TODO: make default output file name if the name is not defined
+template<class T>
+Log & Log::operator<<(T msg)
+{
+    std::ofstream outputFile(m_fileName, std::ios::app);
+    if(outputFile.is_open())
+        outputFile << msg;
+    return *this;
 }
+#define LOG utils::Singleton<utils::Log>::instance()
+}
+

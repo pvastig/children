@@ -18,21 +18,19 @@ void ChildrenNames::read(std::string_view fileName)
         throw std::invalid_argument("Error getting file " + m_fileName);
 
     std::string line;
+    LOG.setFileName(m_fileName);
     while (std::getline(ifs, line))
     {
         ++m_countLines;
         //skip empty strings
         if (line.empty())
         {
-            //TODO: add loggin to file, may be using option?
-            //utils::printArgs(m_countLines, " is empty");
+            LOG << m_countLines << " is empty" << utils::newLine;
             continue;
         }
 
-        if (auto [it, inserted] = m_childrenNames.insert(line);!inserted)
-        {
-            //utils::printArgs(m_countLines, " duplicated data : ", line);
-        }
+        if (auto [it, inserted] = m_childrenNames.insert(line); !inserted)
+            LOG << m_countLines << " has duplicated data : " << line << utils::newLine;
     }
 }
 
@@ -45,13 +43,13 @@ void ChildrenRelations::read(std::string_view fileName)
 
     std::string line;
     std::istringstream iss(line);
+    LOG.setFileName(m_fileName);
     while (std::getline(ifs, line))
     {
         ++m_countLines;
         if (line.empty())
         {
-            //TODO: replace with logging
-            //utils::printArgs(m_countLines, " is empty");
+            LOG << m_countLines << " is empty" << utils::newLine;
             continue;
         }
 
@@ -60,13 +58,13 @@ void ChildrenRelations::read(std::string_view fileName)
         std::string word1, word2;
         if (!(iss >> word1 >> word2))
         {
-            //utils::printArgs(m_countLines, " has invalid data: ", line);
+            LOG << m_countLines << " has invalid data: " << line << utils::newLine;
             continue;
         }
 
         if (word1 == word2)
         {
-            //utils::printArgs(m_countLines, " has same words: ", line);
+            LOG << m_countLines << " has same words: " << line << utils::newLine;
             continue;
         }
 
@@ -161,7 +159,7 @@ void ProcessDataFacade::run() const
         FavouriteChildrenNames
     };
 
-    const std::string_view menu = R"(
+    const std::string menu = R"(
 Select action:"
     "1 - Unloved children"
     "2 - Unhappy children"
@@ -205,4 +203,4 @@ Select action:"
         }
     } while (readAgain);
 }
-};//end namespace PaveA
+};
