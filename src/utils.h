@@ -9,7 +9,7 @@
 namespace utils
 {
 constexpr char const * newLine = "\n";
-#define PRINT_DASHED_LINE std::cout << "\n--------------" << std::endl
+#define PRINT_DASHED_LINE std::cout << "--------------" << std::endl
 
 template<class Any>
 void printArgs(Any&& arg)
@@ -25,18 +25,18 @@ void printArgs(Any&& first, Args&&... args)
     printArgs(args...);
 }
 
-template<class Any>
-void printContainer(Any&& container)
+template<class Container>
+void printContainer(Container&& container)
 {
     PRINT_DASHED_LINE;
-    for (auto const & item : std::forward<Any>(container))
+    for (auto const & item : std::forward<Container>(container))
         printArgs(item, newLine);
     PRINT_DASHED_LINE;
 }
 
 //TODO: make overload of template
-template<class Any>
-void printDataMap(Any container)
+template<class Map>
+void printMap(Map container)
 {
     PRINT_DASHED_LINE;
     for (auto const & [first, second] : container)
@@ -44,23 +44,18 @@ void printDataMap(Any container)
     PRINT_DASHED_LINE;
 }
 
-//TODO: improve template
+//TODO: improve template. leave comment about working
 template<class Any>
 void printComplexContainer(Any container)
 {
-    for (auto const & nameRelation : container)
+    for (auto const & [key, items] : container)
     {
-        const auto & names = nameRelation.second;
-        if (names.empty())
-            continue;
-
-        const auto & firstName = nameRelation.first;
-        const auto & firstRelationName = names.begin();
-        printArgs(firstName, '\t', *firstRelationName, newLine);
-        std::for_each(std::next(names.cbegin()), names.cend(),
-                      [](const auto & relationName)
+        auto const & firstValue = *items.cbegin();
+        printArgs(key, '\t', firstValue, newLine);
+        std::for_each(std::next(items.cbegin()), items.cend(),
+                      [](auto const & item)
                       {
-                          printArgs('\t', relationName, utils::newLine);
+                          printArgs('\t', item, newLine);
                       }
                       );
     }

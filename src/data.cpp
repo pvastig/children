@@ -169,12 +169,12 @@ void ProcessDataFacade::run() const
     };
 
     const std::string menu = R"(
-Select action:"
+Select action:
     "1 - Unloved children"
     "2 - Unhappy children"
     "3 - Favorite children"
     "------------------------"
-    "0 - exit"
+     0 - exit"
 ===> )";
 
     bool readAgain = true;
