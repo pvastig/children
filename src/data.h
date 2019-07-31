@@ -47,7 +47,7 @@ private:
 class ProcessDataFacade
 {
 public:
-    ProcessDataFacade(int argc, char ** argv);
+    ProcessDataFacade(int argc, char const ** argv);
     void run() const;
 
     //list of unloved children

@@ -72,7 +72,7 @@ void ChildrenRelations::read(std::string_view fileName)
     }
 }
 
-ProcessDataFacade::ProcessDataFacade(int argc, char ** argv)
+ProcessDataFacade::ProcessDataFacade(int argc, char const ** argv)
 {
     if (argc != 3)
         throw std::invalid_argument("You should input 2 files");

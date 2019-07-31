@@ -7,8 +7,9 @@ using namespace utils;
 
 namespace Test
 {
+//TODO: make 2 files for testing!
 constexpr int argc = 3;
-static char * argv[] = { "dummy", "../names.dat", "../children_relations.dat" };
+static char const * argv[] = { "dummy", "../names.dat", "../children_relations.dat" };
 #define PRINT_DURATION_TIME  printArgs("elapsed time: ", DURATION_TIME, utils::newLine)
 
 //TODO: improve for different types, may be compare different types?
