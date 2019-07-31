@@ -5,11 +5,11 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <thread>
 
 namespace pa {
 DataFile::~DataFile() = default;
 
-//TODO: add logging to file
 void ChildrenNames::read(std::string_view fileName)
 {
     std::ifstream ifs(fileName.data(), std::ios_base::in);
@@ -56,6 +56,7 @@ void ChildrenRelations::read(std::string_view fileName)
         iss.clear();
         iss.str(line);
         std::string word1, word2;
+        //TODO: investigate this case
         if (!(iss >> word1 >> word2))
         {
             LOG << m_countLines << " has invalid data: " << line << utils::newLine;
@@ -91,9 +92,17 @@ ProcessDataFacade::ProcessDataFacade(int argc, char const ** argv)
     if (wrongFilePath(childrenRelationsFilePath))
         throw std::invalid_argument(childrenRelationsFilePath.data());
 
-    //TODO: try to parallel task
-    m_childrenNames.read(childrenFilePath);
-    m_childrenRelations.read(childrenRelationsFilePath);
+    //TODO: investigate on big data
+    std::thread th1([this, childrenFilePath]()
+                    {
+                        m_childrenNames.read(childrenFilePath);
+                    });
+    std::thread th2([this, childrenRelationsFilePath]()
+                    {
+                        m_childrenRelations.read(childrenRelationsFilePath);
+                    });
+    th1.join();
+    th2.join();
 }
 
 StringList ProcessDataFacade::unlovedChildrenNames() const

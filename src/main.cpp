@@ -15,11 +15,11 @@ int main(int argc, char const * argv[])
     }
     catch (std::bad_alloc const & e)
     {
-        std::cerr << "bad_alloc: " << e.what();
+        std::cerr << "Bad allocation: " << e.what();
     }
     catch (std::exception const & e)
     {
-        std::cerr << "exception: " << e.what();
+        std::cerr << "Exception: " << e.what();
     }
     catch (...)
     {
