@@ -12,3 +12,9 @@ find_package(Threads REQUIRED)
 
 add_executable(${PROJECT} ${HEADERS} ${SOURCES})
 target_link_libraries(${PROJECT} Threads::Threads)
+
+if(MSVC)
+  target_compile_options(${PROJECT} PRIVATE /W4 /WX)
+else()
+  target_compile_options(${PROJECT} PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()

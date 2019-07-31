@@ -140,4 +140,4 @@ void all()
     unhappyChildren();
     favouriteChildren();
 }
-};
+}

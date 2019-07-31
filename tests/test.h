@@ -10,4 +10,4 @@ namespace Test
   void testLog();
 
   void all();
-};
+}

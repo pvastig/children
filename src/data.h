@@ -61,4 +61,4 @@ private:
     ChildrenNames m_childrenNames;
     ChildrenRelations m_childrenRelations;
 };
-};
+}
