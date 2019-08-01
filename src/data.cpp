@@ -92,6 +92,9 @@ ProcessDataFacade::ProcessDataFacade(int argc, char const ** argv)
     if (wrongFilePath(childrenRelationsFilePath))
         throw std::invalid_argument(childrenRelationsFilePath.data());
 
+    /*m_childrenNames.read(childrenFilePath);
+    m_childrenRelations.read(childrenRelationsFilePath);*/
+
     //TODO: investigate on big data
     std::thread th1([this, childrenFilePath]()
                     {

@@ -97,11 +97,12 @@ private:
     std::string m_fileName;
 };
 
-//TODO: make default output file name if the name is not defined
 template<class T>
 Log & Log::operator<<(T msg)
 {
-    std::ofstream outputFile(m_fileName, std::ios::app);
+    if (m_fileName.empty())
+        m_fileName = "file.log";
+    std::ofstream outputFile(m_fileName.data(), std::ios::app);
     if(outputFile.is_open())
         outputFile << msg;
     return *this;

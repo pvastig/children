@@ -1,5 +1,6 @@
-#include"../src/data.h"
 #include "test.h"
+
+#include "../src/data.h"
 #include "../src/utils.h"
 
 using namespace pa;
@@ -7,10 +8,14 @@ using namespace utils;
 
 namespace Test
 {
-//TODO: make 2 files for testing!
-constexpr int argc = 3;
+#define PRINT_DURATION_TIME(str) printArgs(str, DURATION_TIME, newLine)
+#define FILE_LINE __LINE__
+#define PRINT_FUNC_NAME printArgs(newLine, __func__, ":", newLine)
+
 static char const * argv[] = { "dummy", "../names.dat", "../children_relations.dat" };
-#define PRINT_DURATION_TIME  printArgs("elapsed time: ", DURATION_TIME, utils::newLine)
+constexpr int argc = 3;
+constexpr char const * strDataReading = "Data reading: ";
+constexpr char const * strFuncExec    = "Execution: ";
 
 //TODO: improve for different types, may be compare different types?
 template<class T1, class T2>
@@ -33,29 +38,29 @@ void compareContainers(T1 referenceContainer, T2 comparedContainer, int lineErro
 
 void readDataNames()
 {
-    printArgs(__func__);
+    PRINT_FUNC_NAME;
     ChildrenNames names;
 
     START_TIME;
     names.read("../test_reading_names.dat");
     STOP_TIME;
-    PRINT_DURATION_TIME;
+    PRINT_DURATION_TIME(strDataReading);
 
     auto const & childrenNames = names.names();
     StringList readNames(childrenNames.cbegin(), childrenNames.cend());
     StringList const referencedNames = { "Vasya", "Mash", "123Geor", "Pertya", "Richard5", "Katya", "1" };
-    compareContainers(referencedNames, readNames, __LINE__);
+    compareContainers(referencedNames, readNames, FILE_LINE);
 }
 
 void readDataRelations()
 {
-    printArgs(__func__);
+    PRINT_FUNC_NAME;
     ChildrenRelations childrenRelations;
 
     START_TIME;
     childrenRelations.read("../test_reading_relations.dat");
     STOP_TIME;
-    PRINT_DURATION_TIME;
+    PRINT_DURATION_TIME(strDataReading);
 
     auto const & name2RelatedNames = childrenRelations.name2RelatedNames();
     StringUnordMap const referenceNames = {
@@ -79,50 +84,61 @@ void readDataRelations()
         refRelatedNames.insert(relatedName.cbegin(), relatedName.cend());
     }
 
-    compareContainers(readNames, refNames, __LINE__);
-    compareContainers(relatedNames, refRelatedNames, __LINE__);
+    compareContainers(readNames, refNames, FILE_LINE);
+    compareContainers(relatedNames, refRelatedNames, FILE_LINE);
 }
 
 void unlovedChildren()
 {
-    printArgs(__func__);
+    PRINT_FUNC_NAME;
     StringList const referenceNames = { "Marina", "Richard5", "Vasya" };
+    START_TIME;
     ProcessDataFacade prData(argc, argv);
+    STOP_TIME;
+    PRINT_DURATION_TIME(strDataReading);
 
     START_TIME;
     auto const unlovedChildrenNames = prData.unlovedChildrenNames();
     STOP_TIME;
-    PRINT_DURATION_TIME;
+    PRINT_DURATION_TIME(strFuncExec);
 
-    compareContainers(referenceNames, unlovedChildrenNames, __LINE__);
+    compareContainers(referenceNames, unlovedChildrenNames, FILE_LINE);
 }
 
 void unhappyChildren()
 {
-    printArgs(__func__);
+    PRINT_FUNC_NAME;
     StringList const referenceNames{ "Vasya" };
+
+    START_TIME;
     ProcessDataFacade prData(argc, argv);
+    STOP_TIME;
+    PRINT_DURATION_TIME(strDataReading);
 
     START_TIME;
     auto const unhappyChildrenNames = prData.unhappyChildrenNames();
     STOP_TIME;
-    PRINT_DURATION_TIME;
+    PRINT_DURATION_TIME(strFuncExec);
 
-    compareContainers(referenceNames, unhappyChildrenNames, __LINE__);
+    compareContainers(referenceNames, unhappyChildrenNames, FILE_LINE);
 }
 
 void favouriteChildren()
 {
-    printArgs(__func__);
+    PRINT_FUNC_NAME;
     StringList const referenceNames{ "Masha: 3", "Oleg: 2" };
+
+    START_TIME;
     ProcessDataFacade prData(argc, argv);
+    STOP_TIME;
+    PRINT_DURATION_TIME(strDataReading);
 
     START_TIME;
     auto const favouriteChildrenNames = prData.favouriteChildrenNames();
     STOP_TIME;
-    PRINT_DURATION_TIME;
+    PRINT_DURATION_TIME(strFuncExec);
 
-    compareContainers(referenceNames, favouriteChildrenNames, __LINE__);
+    compareContainers(referenceNames, favouriteChildrenNames, FILE_LINE);
 }
 
 //TODO: improve test
