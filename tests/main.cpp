@@ -12,8 +12,9 @@ int main()
         //unlovedChildren();
         //unhappyChildren();
         //favouriteChildren();
-        all();
+        //all();
         //testLog();
+        testConcurrencyReading();
         return 0;
     }
     catch (const std::exception& e)

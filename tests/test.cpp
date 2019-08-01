@@ -3,6 +3,8 @@
 #include "../src/data.h"
 #include "../src/utils.h"
 
+#include <thread>
+
 using namespace pa;
 using namespace utils;
 
@@ -146,6 +148,48 @@ void testLog()
 {
     LOG.setFileName("testLog.log");
     LOG << "this is big test";
+}
+
+//TODO: improve
+void testConcurrencyReading()
+{
+    PRINT_FUNC_NAME;
+
+    START_TIME;
+    {
+        START_TIME;
+        ChildrenNames().read(argv[1]);
+        STOP_TIME;
+        PRINT_DURATION_TIME("First: ");
+    }
+
+    {
+        START_TIME;
+        ChildrenRelations().read(argv[2]);
+        STOP_TIME;
+        PRINT_DURATION_TIME("Second: ");
+    }
+    STOP_TIME;
+    PRINT_DURATION_TIME("Total: ");
+
+    START_TIME;
+    {
+        START_TIME;
+        std::thread th1([]() { ChildrenNames().read(argv[1]); });
+        th1.join();
+        STOP_TIME;
+        PRINT_DURATION_TIME("First thread: ");
+    }
+
+    {
+        START_TIME;
+        std::thread th2([]() { ChildrenRelations().read(argv[2]);});
+        th2.join();
+        STOP_TIME;
+        PRINT_DURATION_TIME("Second thread: ");
+    }
+    STOP_TIME;
+    PRINT_DURATION_TIME("Total: ");
 }
 
 void all()
