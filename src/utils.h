@@ -76,7 +76,7 @@ class Timer
 {
 public:
     void start();
-    void end();
+    void stop();
     long duration() const;
 
 private:
@@ -84,22 +84,27 @@ private:
 };
 
 #define START_TIME    Singleton<Timer>::instance().start()
-#define STOP_TIME     Singleton<Timer>::instance().end()
+#define STOP_TIME     Singleton<Timer>::instance().stop()
 #define DURATION_TIME Singleton<Timer>::instance().duration()
 
 class Log
 {
 public:
-    void setFileName(std::string_view fileName);
+    void setFileName(std::string const & fileName);
     template<class T>
     Log & operator<<(T msg);
+    void enableLog(bool enable);
+
 private:
     std::string m_fileName;
+    bool m_enable = false;
 };
 
 template<class T>
 Log & Log::operator<<(T msg)
 {
+    if (!m_enable)
+        return *this;
     if (m_fileName.empty())
         m_fileName = "file.log";
     std::ofstream outputFile(m_fileName.data(), std::ios::app);

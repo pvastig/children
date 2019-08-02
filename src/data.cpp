@@ -75,7 +75,13 @@ void ChildrenRelations::read(std::string_view fileName)
 
 ProcessDataFacade::ProcessDataFacade(int argc, char const ** argv)
 {
-    if (argc != 3)
+    if (argc == 4)
+    {
+        //TODO: make possibility process arguments and make helo for them
+        if (argv[3] == std::string("--log"))
+            LOG.enableLog(true);
+    }
+    else if (argc != 3)
         throw std::invalid_argument("You should input 2 files");
 
     namespace fs = std::filesystem;
@@ -177,7 +183,7 @@ Select action:
     "2 - Unhappy children"
     "3 - Favorite children"
     "------------------------"
-     0 - exit"
+     0 - exit
 ===> )";
 
     bool readAgain = true;
