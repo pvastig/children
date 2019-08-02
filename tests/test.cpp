@@ -33,8 +33,8 @@ void compareContainers(T1 referenceContainer, T2 comparedContainer, int lineErro
     {
         if (*it1 != *it2)
             throw std::logic_error("Line: "              + std::to_string(lineError) +
-                                    ". Reference name: " + *it1                      +
-                                    ". Compared name: "  + *it2);
+                                   ". Reference name: " + *it1                       +
+                                   ". Compared name: "  + *it2);
     }
 }
 
@@ -143,53 +143,57 @@ void favouriteChildren()
     compareContainers(referenceNames, favouriteChildrenNames, FILE_LINE);
 }
 
-//TODO: improve test
+//TODO: make big files for reading data
 void testLog()
 {
-    LOG.setFileName("testLog.log");
+    LOG.setFileName("testLog");
     LOG << "this is big test";
 }
 
-//TODO: improve
 void testConcurrencyReading()
 {
     PRINT_FUNC_NAME;
 
-    START_TIME;
     {
-        START_TIME;
-        ChildrenNames().read(argv[1]);
-        STOP_TIME;
-        PRINT_DURATION_TIME("First: ");
-    }
+        Timer totalTime;
+        totalTime.start();
+        {
+            START_TIME;
+            ChildrenNames().read(argv[1]);
+            STOP_TIME;
+            PRINT_DURATION_TIME("First reading: ");
+        }
 
-    {
-        START_TIME;
-        ChildrenRelations().read(argv[2]);
-        STOP_TIME;
-        PRINT_DURATION_TIME("Second: ");
+        {
+            START_TIME;
+            ChildrenRelations().read(argv[2]);
+            STOP_TIME;
+            PRINT_DURATION_TIME("Second reading: ");
+        }
+        totalTime.stop();
+        printArgs("Total: ", totalTime.duration(), newLine);
     }
-    STOP_TIME;
-    PRINT_DURATION_TIME("Total: ");
+    {
+        Timer totalTime;
+        totalTime.start();
+        {
+            START_TIME;
+            std::thread th1([]() { ChildrenNames().read(argv[1]); });
+            th1.join();
+            STOP_TIME;
+            PRINT_DURATION_TIME("First thread: ");
+        }
 
-    START_TIME;
-    {
-        START_TIME;
-        std::thread th1([]() { ChildrenNames().read(argv[1]); });
-        th1.join();
-        STOP_TIME;
-        PRINT_DURATION_TIME("First thread: ");
+        {
+            START_TIME;
+            std::thread th2([]() { ChildrenRelations().read(argv[2]);});
+            th2.join();
+            STOP_TIME;
+            PRINT_DURATION_TIME("Second thread: ");
+        }
+        totalTime.stop();
+        printArgs("Total: ", totalTime.duration(), newLine);
     }
-
-    {
-        START_TIME;
-        std::thread th2([]() { ChildrenRelations().read(argv[2]);});
-        th2.join();
-        STOP_TIME;
-        PRINT_DURATION_TIME("Second thread: ");
-    }
-    STOP_TIME;
-    PRINT_DURATION_TIME("Total: ");
 }
 
 void all()
