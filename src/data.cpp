@@ -98,11 +98,11 @@ ProcessDataFacade::ProcessDataFacade(int argc, char const ** argv)
     if (wrongFilePath(childrenRelationsFilePath))
         throw std::invalid_argument(childrenRelationsFilePath.data());
 
-    /*m_childrenNames.read(childrenFilePath);
-    m_childrenRelations.read(childrenRelationsFilePath);*/
+    m_childrenNames.read(childrenFilePath);
+    m_childrenRelations.read(childrenRelationsFilePath);
 
     //TODO: investigate on big data
-    std::thread th1([this, childrenFilePath]()
+    /*std::thread th1([this, childrenFilePath]()
                     {
                         m_childrenNames.read(childrenFilePath);
                     });
@@ -111,7 +111,7 @@ ProcessDataFacade::ProcessDataFacade(int argc, char const ** argv)
                         m_childrenRelations.read(childrenRelationsFilePath);
                     });
     th1.join();
-    th2.join();
+    th2.join();*/
 }
 
 StringList ProcessDataFacade::unlovedChildrenNames() const
@@ -194,7 +194,6 @@ Select action:
         std::cin >> num;
         if (!std::cin)
         {
-            //TODO: improve clearing
             std::cin.clear();
             std::string s;
             std::cin >> s;

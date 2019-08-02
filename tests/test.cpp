@@ -4,6 +4,7 @@
 #include "../src/utils.h"
 
 #include <thread>
+#include <set>
 
 using namespace pa;
 using namespace utils;
@@ -19,22 +20,28 @@ constexpr int argc = 3;
 constexpr char const * strDataReading = "Data reading: ";
 constexpr char const * strFuncExec    = "Execution: ";
 
-//TODO: improve for different types, may be compare different types?
 template<class T1, class T2>
 void compareContainers(T1 referenceContainer, T2 comparedContainer, int lineError)
 {
-    auto const size1 = std::distance(referenceContainer.cbegin(), comparedContainer.cend());
+    //TODO: if container has size, use size, otherwise use distance
+    auto const size1 = std::distance(referenceContainer.cbegin(), referenceContainer.cend());
     auto const size2 = std::distance(comparedContainer.cbegin(), comparedContainer.cend());
     if (size1 != size2)
+    {
+        printContainer(comparedContainer);
         throw std::length_error("Line: "             + std::to_string(lineError) +
                                 ". Reference size: " + std::to_string(size1)     +
                                 ". Compared size: "  + std::to_string(size2));
+    }
     for (auto it1 = referenceContainer.cbegin(), it2 = comparedContainer.cbegin(); it1 != referenceContainer.cend(); ++it1, ++it2)
     {
         if (*it1 != *it2)
+        {
+            printContainer(comparedContainer);
             throw std::logic_error("Line: "              + std::to_string(lineError) +
                                    ". Reference name: " + *it1                       +
                                    ". Compared name: "  + *it2);
+        }
     }
 }
 
@@ -44,13 +51,13 @@ void readDataNames()
     ChildrenNames names;
 
     START_TIME;
-    names.read("../test_reading_names.dat");
+    names.read(argv[1]);
     STOP_TIME;
     PRINT_DURATION_TIME(strDataReading);
 
     auto const & childrenNames = names.names();
     StringList readNames(childrenNames.cbegin(), childrenNames.cend());
-    StringList const referencedNames = { "Vasya", "Mash", "123Geor", "Pertya", "Richard5", "Katya", "1" };
+    StringList const referencedNames = { "Oleg", "Vasya","Masha", "Richard5", "123Georg", "Katya", "Petya", "Marina" };
     compareContainers(referencedNames, readNames, FILE_LINE);
 }
 
@@ -60,34 +67,35 @@ void readDataRelations()
     ChildrenRelations childrenRelations;
 
     START_TIME;
-    childrenRelations.read("../test_reading_relations.dat");
+    childrenRelations.read(argv[2]);
     STOP_TIME;
     PRINT_DURATION_TIME(strDataReading);
 
     auto const & name2RelatedNames = childrenRelations.name2RelatedNames();
-    StringUnordMap const referenceNames = {
-        {"Petya", {"Vasya" }},
-        {"Vasya", {"Masha", "Katya"}},
-        {"Katya", {"123Gerg"}}
-    };
     StringList readNames;
-    StringUnordSet relatedNames;
+    std::set<std::string> relatedNames;
     for (auto const & [name, relatedName] : name2RelatedNames)
     {
         readNames.push_front(name);
         relatedNames.insert(relatedName.cbegin(), relatedName.cend());
     }
 
+    StringUnordMap const referenceNames = {
+        {"Vasya", {"Masha", "Oleg", "123Georg"}},
+        {"Masha", {"Petya", "Oleg", "Katya"}},
+        {"Katya", {"Masha"}},
+        {"Oleg",  {"Masha"}}
+    };
     StringList refNames;
-    StringUnordSet refRelatedNames;
+    std::set<std::string> refRelatedNames;
     for (auto const & [name, relatedName] : referenceNames)
     {
         refNames.push_front(name);
         refRelatedNames.insert(relatedName.cbegin(), relatedName.cend());
     }
 
-    compareContainers(readNames, refNames, FILE_LINE);
-    compareContainers(relatedNames, refRelatedNames, FILE_LINE);
+    compareContainers(refNames, readNames, FILE_LINE);
+    compareContainers(refRelatedNames, relatedNames, FILE_LINE);
 }
 
 void unlovedChildren()
@@ -150,16 +158,18 @@ void testLog()
     LOG << "this is big test";
 }
 
-void testConcurrencyReading()
+void concurrencyReading()
 {
     PRINT_FUNC_NAME;
+    std::string_view fileNames = "../names_cuncurrency_test.dat";
 
     {
+        printArgs("Without cuncurrency:", newLine);
         Timer totalTime;
         totalTime.start();
         {
             START_TIME;
-            ChildrenNames().read(argv[1]);
+            ChildrenNames().read(fileNames);
             STOP_TIME;
             PRINT_DURATION_TIME("First reading: ");
         }
@@ -174,11 +184,12 @@ void testConcurrencyReading()
         printArgs("Total: ", totalTime.duration(), newLine);
     }
     {
+        printArgs("With cuncurrency:", newLine);
         Timer totalTime;
         totalTime.start();
         {
             START_TIME;
-            std::thread th1([]() { ChildrenNames().read(argv[1]); });
+            std::thread th1([fileNames]() { ChildrenNames().read(fileNames); });
             th1.join();
             STOP_TIME;
             PRINT_DURATION_TIME("First thread: ");
@@ -203,5 +214,6 @@ void all()
     unlovedChildren();
     unhappyChildren();
     favouriteChildren();
+    concurrencyReading();
 }
 }
