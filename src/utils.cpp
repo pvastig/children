@@ -4,7 +4,7 @@ namespace utils
 {
 void Timer::start()
 {
-    m_start = std::chrono::system_clock::now();
+    m_begin = std::chrono::system_clock::now();
 }
 
 void Timer::stop()
@@ -14,7 +14,7 @@ void Timer::stop()
 
 long Timer::duration() const
 {
-    auto const duration = m_end - m_start;
+    auto const duration = m_end - m_begin;
     return duration.count();
 }
 
