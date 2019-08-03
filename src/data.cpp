@@ -22,7 +22,6 @@ void ChildrenNames::read(std::string_view fileName)
     while (std::getline(ifs, line))
     {
         ++m_countLines;
-        //skip empty strings
         if (line.empty())
         {
             LOG << m_countLines << " is empty" << utils::newLine;
@@ -42,7 +41,6 @@ void ChildrenRelations::read(std::string_view fileName)
         throw std::invalid_argument("Error getting file: " + m_fileName);
 
     std::string line;
-    std::istringstream iss(line);
     LOG.setFileName(m_fileName);
     while (std::getline(ifs, line))
     {
@@ -53,8 +51,7 @@ void ChildrenRelations::read(std::string_view fileName)
             continue;
         }
 
-        iss.clear();
-        iss.str(line);
+        std::istringstream iss(line);
         std::string word1, word2;
         //TODO: investigate this case
         if (!(iss >> word1 >> word2))
@@ -62,7 +59,7 @@ void ChildrenRelations::read(std::string_view fileName)
             LOG << m_countLines << " has invalid data: " << line << utils::newLine;
             continue;
         }
-
+        //The case is from task
         if (word1 == word2)
         {
             LOG << m_countLines << " has same words: " << line << utils::newLine;

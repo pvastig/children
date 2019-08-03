@@ -189,6 +189,7 @@ void concurrencyReading()
         totalTime.start();
         {
             START_TIME;
+            //TODO: try async mode to take a look at results
             std::thread th1([fileNames]() { ChildrenNames().read(fileNames); });
             th1.join();
             STOP_TIME;
@@ -197,6 +198,7 @@ void concurrencyReading()
 
         {
             START_TIME;
+            //TODO: make large file for children relation
             std::thread th2([]() { ChildrenRelations().read(argv[2]);});
             th2.join();
             STOP_TIME;
