@@ -11,18 +11,18 @@ namespace utils
 constexpr char const * newLine = "\n";
 #define PRINT_DASHED_LINE std::cout << "--------------" << std::endl
 
-template<class Any>
-void printArgs(Any&& arg)
-{
-    std::cout << std::forward<Any>(arg);
-}
-
-template<class Any, typename... Args>
-void printArgs(Any&& first, Args&&... args)
+template<class T>
+void print(T arg)
 {
     std::ios::sync_with_stdio(false);
-    std::cout << std::forward<Any>(first);
-    printArgs(args...);
+    std::cout << arg;
+}
+
+template<class T, typename... Args>
+void print(T firstArg, Args &&... args)
+{
+    print(firstArg);
+    print(args...);
 }
 
 template<class Container>
@@ -30,7 +30,7 @@ void printContainer(Container&& container)
 {
     PRINT_DASHED_LINE;
     for (auto const & item : std::forward<Container>(container))
-        printArgs(item, newLine);
+        print(item, newLine);
     PRINT_DASHED_LINE;
 }
 
@@ -40,7 +40,7 @@ void printMap(Map container)
 {
     PRINT_DASHED_LINE;
     for (auto const & [first, second] : container)
-        printArgs(first, ' ', second, newLine);
+        print(first, ' ', second, newLine);
     PRINT_DASHED_LINE;
 }
 
@@ -51,11 +51,11 @@ void printComplexContainer(Any container)
     for (auto const & [key, items] : container)
     {
         auto const & firstValue = *items.cbegin();
-        printArgs(key, '\t', firstValue, newLine);
+        print(key, '\t', firstValue, newLine);
         std::for_each(std::next(items.cbegin()), items.cend(),
                       [](auto const & item)
                       {
-                          printArgs('\t', item, newLine);
+                          print('\t', item, newLine);
                       }
                       );
     }

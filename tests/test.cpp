@@ -11,9 +11,9 @@ using namespace utils;
 
 namespace Test
 {
-#define PRINT_DURATION_TIME(str) printArgs(str, DURATION_TIME, newLine)
+#define PRINT_DURATION_TIME(str) print(str, DURATION_TIME, newLine)
 #define FILE_LINE __LINE__
-#define PRINT_FUNC_NAME printArgs(newLine, __func__, ":", newLine)
+#define PRINT_FUNC_NAME print(newLine, __func__, ": ", newLine)
 
 static char const * argv[] = { "dummy", "../names.dat", "../children_relations.dat" };
 constexpr int argc = 3;
@@ -164,7 +164,7 @@ void concurrencyReading()
     std::string_view fileNames = "../names_cuncurrency_test.dat";
 
     {
-        printArgs("Without cuncurrency:", newLine);
+        print("Without cuncurrency:", newLine);
         Timer totalTime;
         totalTime.start();
         {
@@ -181,10 +181,10 @@ void concurrencyReading()
             PRINT_DURATION_TIME("Second reading: ");
         }
         totalTime.stop();
-        printArgs("Total: ", totalTime.duration(), newLine);
+        print("Total: ", totalTime.duration(), newLine);
     }
     {
-        printArgs("With cuncurrency:", newLine);
+        print("With cuncurrency:", newLine);
         Timer totalTime;
         totalTime.start();
         {
@@ -205,7 +205,7 @@ void concurrencyReading()
             PRINT_DURATION_TIME("Second thread: ");
         }
         totalTime.stop();
-        printArgs("Total: ", totalTime.duration(), newLine);
+        print("Total: ", totalTime.duration(), newLine);
     }
 }
 

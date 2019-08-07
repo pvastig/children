@@ -186,7 +186,7 @@ Select action:
     bool readAgain = true;
     do
     {
-        utils::printArgs(menu);
+        utils::print(menu);
         int num = 0;
         std::cin >> num;
         if (!std::cin)
@@ -208,11 +208,11 @@ Select action:
             utils::printContainer(favouriteChildrenNames());
             break;
         case UserSelect::Exit:
-            utils::printArgs("Bye-bye :)", utils::newLine);
+            utils::print("Bye-bye :)", utils::newLine);
             readAgain = false;
             break;
         default:
-            utils::printArgs("You entered not existed action, please, try again :)", utils::newLine);
+            utils::print("You entered not existed action, please, try again :)", utils::newLine);
             break;
         }
     } while (readAgain);
