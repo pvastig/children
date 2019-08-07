@@ -91,6 +91,7 @@ class Log
 {
 public:
     void setFileName(std::string const & fileName);
+    void setFileName(std::string_view fileName);
     template<class T>
     Log & operator<<(T msg);
     void enableLog(bool enable);

@@ -1,8 +1,10 @@
 #pragma once
 
+#include <future>
 #include <forward_list>
 #include <string>
 #include <string_view>
+#include <vector>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -13,10 +15,9 @@ class DataFile
 {
 public:
     virtual ~DataFile();
-    virtual void read(std::string_view fileName) = 0;
+    virtual bool read(std::string_view fileName) = 0;
 
 protected:
-    std::string m_fileName;
     size_t m_countLines = 0;
 };
 
@@ -27,8 +28,8 @@ using StringUnordMap = std::unordered_map<std::string, StringUnordSet>;
 class ChildrenNames : public DataFile
 {
 public:
-    void read(std::string_view fileName) override;
-    StringUnordSet const & names() const { return m_childrenNames; }
+    bool read(std::string_view fileName) override;
+    auto const & names() const { return m_childrenNames; }
 
 private:
     StringUnordSet m_childrenNames;
@@ -37,8 +38,8 @@ private:
 class ChildrenRelations : public DataFile
 {
 public:
-    void read(std::string_view fileName) override;
-    StringUnordMap const & name2RelatedNames() const { return m_name2RelatedNames; }
+    bool read(std::string_view fileName) override;
+    auto const & name2RelatedNames() const { return m_name2RelatedNames; }
 
 private:
     StringUnordMap m_name2RelatedNames;
@@ -48,7 +49,7 @@ class ProcessDataFacade
 {
 public:
     ProcessDataFacade(int argc, char const ** argv);
-    void run() const;
+    void run();
 
     //list of unloved children
     StringList unlovedChildrenNames() const;
@@ -60,5 +61,7 @@ public:
 private:
     ChildrenNames m_childrenNames;
     ChildrenRelations m_childrenRelations;
+
+    std::vector<std::future<void>> m_futures;
 };
 }

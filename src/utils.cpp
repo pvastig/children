@@ -23,6 +23,11 @@ void Log::setFileName(std::string const & fileName)
     m_fileName = fileName + ".log";
 }
 
+void Log::setFileName(std::string_view fileName)
+{
+    m_fileName.append(fileName).append(".log");
+}
+
 void Log::enableLog(bool enable)
 {
     m_enable = enable;

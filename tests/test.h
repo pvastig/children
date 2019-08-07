@@ -7,7 +7,6 @@ namespace Test
   void unlovedChildren();
   void unhappyChildren();
   void favouriteChildren();
-  void testLog();
   void concurrencyReading();
 
   void all();

@@ -3,22 +3,22 @@
 #include "utils.h"
 
 #include <algorithm>
+#include <cassert>
 #include <filesystem>
+#include <future>
 #include <fstream>
-#include <thread>
 
 namespace pa {
 DataFile::~DataFile() = default;
 
-void ChildrenNames::read(std::string_view fileName)
+bool ChildrenNames::read(std::string_view fileName)
 {
     std::ifstream ifs(fileName.data(), std::ios_base::in);
-    m_fileName = fileName;
+    assert(ifs.is_open());
     if (!ifs.is_open())
-        throw std::invalid_argument("Error getting file " + m_fileName);
+        return false;
 
     std::string line;
-    LOG.setFileName(m_fileName);
     while (std::getline(ifs, line))
     {
         ++m_countLines;
@@ -31,17 +31,18 @@ void ChildrenNames::read(std::string_view fileName)
         if (auto [it, inserted] = m_childrenNames.insert(line); !inserted)
             LOG << m_countLines << " has duplicated data : " << line << utils::newLine;
     }
+
+    return true;
 }
 
-void ChildrenRelations::read(std::string_view fileName)
+bool ChildrenRelations::read(std::string_view fileName)
 {
     std::ifstream ifs(fileName.data(), std::ios_base::in);
-    m_fileName = fileName;
+    assert(ifs.is_open());
     if (!ifs.is_open())
-        throw std::invalid_argument("Error getting file: " + m_fileName);
+        return false;
 
     std::string line;
-    LOG.setFileName(m_fileName);
     while (std::getline(ifs, line))
     {
         ++m_countLines;
@@ -68,13 +69,16 @@ void ChildrenRelations::read(std::string_view fileName)
 
         m_name2RelatedNames[word1].insert(word2);
     }
+
+    return true;
 }
 
 ProcessDataFacade::ProcessDataFacade(int argc, char const ** argv)
 {
+    //TODO: split on functions
     if (argc == 4)
     {
-        //TODO: make possibility process arguments and make helo for them
+        //TODO: make possibility process arguments and make help for them
         if (argv[3] == std::string("--log"))
             LOG.enableLog(true);
     }
@@ -95,20 +99,18 @@ ProcessDataFacade::ProcessDataFacade(int argc, char const ** argv)
     if (wrongFilePath(childrenRelationsFilePath))
         throw std::invalid_argument(childrenRelationsFilePath.data());
 
-    m_childrenNames.read(childrenFilePath);
-    m_childrenRelations.read(childrenRelationsFilePath);
+    LOG.setFileName(childrenFilePath);
+    LOG.setFileName(childrenRelationsFilePath);
 
-    //TODO: investigate on big data
-    /*std::thread th1([this, childrenFilePath]()
-                    {
-                        m_childrenNames.read(childrenFilePath);
-                    });
-    std::thread th2([this, childrenRelationsFilePath]()
-                    {
-                        m_childrenRelations.read(childrenRelationsFilePath);
-                    });
-    th1.join();
-    th2.join();*/
+    //TODO: may be use only one async?
+    m_futures.push_back(std::async([this, childrenFilePath]()
+                                   {
+                                       m_childrenNames.read(childrenFilePath);
+                                   }));
+    m_futures.push_back(std::async([this, childrenRelationsFilePath]()
+                                   {
+                                       m_childrenRelations.read(childrenRelationsFilePath);
+                                   }));
 }
 
 StringList ProcessDataFacade::unlovedChildrenNames() const
@@ -164,15 +166,10 @@ StringList ProcessDataFacade::favouriteChildrenNames() const
     return results;
 }
 
-void ProcessDataFacade::run() const
+void ProcessDataFacade::run()
 {
-    enum class UserSelect : char
-    {
-        Exit,
-        UnlovedChildrenNames,
-        UnhappyChildrenNames,
-        FavouriteChildrenNames
-    };
+    for (auto & future : m_futures)
+        future.get();
 
     const std::string menu = R"(
 Select action:
@@ -183,6 +180,13 @@ Select action:
      0 - exit
 ===> )";
 
+    enum class UserSelect : char
+    {
+        Exit,
+        UnlovedChildrenNames,
+        UnhappyChildrenNames,
+        FavouriteChildrenNames
+    };
     bool readAgain = true;
     do
     {

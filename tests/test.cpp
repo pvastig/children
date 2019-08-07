@@ -3,7 +3,7 @@
 #include "../src/data.h"
 #include "../src/utils.h"
 
-#include <thread>
+#include <future>
 #include <set>
 
 using namespace pa;
@@ -45,18 +45,27 @@ void compareContainers(T1 referenceContainer, T2 comparedContainer, int lineErro
     }
 }
 
+void checkValue(bool val, int lineError)
+{
+    if (!val)
+        throw std::logic_error("Line: "              + std::to_string(lineError) +
+                               ". is false!");
+}
+
 void readDataNames()
 {
     PRINT_FUNC_NAME;
-    ChildrenNames names;
+    ChildrenNames childrenNames;
 
     START_TIME;
-    names.read(argv[1]);
+    bool res = childrenNames.read(argv[1]);
     STOP_TIME;
     PRINT_DURATION_TIME(strDataReading);
 
-    auto const & childrenNames = names.names();
-    StringList readNames(childrenNames.cbegin(), childrenNames.cend());
+    checkValue(res, FILE_LINE);
+
+    auto const & names = childrenNames.names();
+    StringList readNames(names.cbegin(), names.cend());
     StringList const referencedNames = { "Oleg", "Vasya","Masha", "Richard5", "123Georg", "Katya", "Petya", "Marina" };
     compareContainers(referencedNames, readNames, FILE_LINE);
 }
@@ -67,9 +76,11 @@ void readDataRelations()
     ChildrenRelations childrenRelations;
 
     START_TIME;
-    childrenRelations.read(argv[2]);
+    bool res = childrenRelations.read(argv[2]);
     STOP_TIME;
     PRINT_DURATION_TIME(strDataReading);
+
+    checkValue(res, FILE_LINE);
 
     auto const & name2RelatedNames = childrenRelations.name2RelatedNames();
     StringList readNames;
@@ -151,13 +162,6 @@ void favouriteChildren()
     compareContainers(referenceNames, favouriteChildrenNames, FILE_LINE);
 }
 
-//TODO: make big files for reading data
-void testLog()
-{
-    LOG.setFileName("testLog");
-    LOG << "this is big test";
-}
-
 void concurrencyReading()
 {
     PRINT_FUNC_NAME;
@@ -186,24 +190,30 @@ void concurrencyReading()
     {
         print("With cuncurrency:", newLine);
         Timer totalTime;
+        std::future<void> fut1, fut2;
         totalTime.start();
-        {
-            START_TIME;
-            //TODO: try async mode to take a look at results
-            std::thread th1([fileNames]() { ChildrenNames().read(fileNames); });
-            th1.join();
-            STOP_TIME;
-            PRINT_DURATION_TIME("First thread: ");
-        }
 
-        {
-            START_TIME;
-            //TODO: make large file for children relation
-            std::thread th2([]() { ChildrenRelations().read(argv[2]);});
-            th2.join();
-            STOP_TIME;
-            PRINT_DURATION_TIME("Second thread: ");
-        }
+        START_TIME;
+        fut1 = std::async([fileNames]() { ChildrenNames().read(fileNames); });
+        STOP_TIME;
+        PRINT_DURATION_TIME("First thread: ");
+
+        START_TIME;
+        fut2 = std::async([]() { ChildrenRelations().read(argv[2]);});
+        STOP_TIME;
+        PRINT_DURATION_TIME("Second thread: ");
+
+
+        START_TIME;
+        fut1.get();
+        STOP_TIME;
+        PRINT_DURATION_TIME("future1: ");
+
+        START_TIME;
+        fut2.get();
+        STOP_TIME;
+        PRINT_DURATION_TIME("future2: ");
+
         totalTime.stop();
         print("Total: ", totalTime.duration(), newLine);
     }
