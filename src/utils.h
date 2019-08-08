@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <future>
 #include <fstream>
 #include <iostream>
 #include <string_view>
@@ -19,7 +20,7 @@ void print(T arg)
 }
 
 template<class T, typename... Args>
-void print(T firstArg, Args &&... args)
+void print(T firstArg, Args&&... args)
 {
     print(firstArg);
     print(args...);
@@ -45,8 +46,8 @@ void printMap(Map container)
 }
 
 //TODO: improve template. leave comment about working
-template<class Any>
-void printComplexContainer(Any container)
+template<class T>
+void printComplexContainer(T container)
 {
     for (auto const & [key, items] : container)
     {
@@ -92,12 +93,13 @@ class Log
 public:
     void setFileName(std::string const & fileName);
     void setFileName(std::string_view fileName);
+    void enableLog(bool enable);
     template<class T>
     Log & operator<<(T msg);
-    void enableLog(bool enable);
 
 private:
-    std::string m_fileName;
+    std::ofstream m_outputFile;
+    std::string m_fileName = "file.log"; //TODO: make date for file name
     bool m_enable = false;
 };
 
@@ -106,13 +108,17 @@ Log & Log::operator<<(T msg)
 {
     if (!m_enable)
         return *this;
-    if (m_fileName.empty())
-        m_fileName = "file.log";
-    std::ofstream outputFile(m_fileName.data(), std::ios::app);
-    if(outputFile.is_open())
-        outputFile << msg;
+    m_outputFile.open(m_fileName.data(), std::ios::app);
+    if(m_outputFile.is_open())
+        m_outputFile << msg;
     return *this;
 }
 #define LOG utils::Singleton<utils::Log>::instance()
+
+template<class F, typename... Ts>
+auto runAsync(F&& f, Ts&&... params)
+{
+    return std::async(std::launch::async, std::forward<F>(f), std::forward<Ts>(params)...);
+}
 }
 

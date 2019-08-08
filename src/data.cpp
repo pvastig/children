@@ -18,6 +18,8 @@ bool ChildrenNames::read(std::string_view fileName)
     if (!ifs.is_open())
         return false;
 
+    LOG.setFileName(fileName);
+
     std::string line;
     while (std::getline(ifs, line))
     {
@@ -41,6 +43,8 @@ bool ChildrenRelations::read(std::string_view fileName)
     assert(ifs.is_open());
     if (!ifs.is_open())
         return false;
+
+    LOG.setFileName(fileName);
 
     std::string line;
     while (std::getline(ifs, line))
@@ -99,18 +103,14 @@ ProcessDataFacade::ProcessDataFacade(int argc, char const ** argv)
     if (wrongFilePath(childrenRelationsFilePath))
         throw std::invalid_argument(childrenRelationsFilePath.data());
 
-    LOG.setFileName(childrenFilePath);
-    LOG.setFileName(childrenRelationsFilePath);
-
-    //TODO: may be use only one async?
-    m_futures.push_back(std::async([this, childrenFilePath]()
-                                   {
-                                       m_childrenNames.read(childrenFilePath);
-                                   }));
-    m_futures.push_back(std::async([this, childrenRelationsFilePath]()
-                                   {
-                                       m_childrenRelations.read(childrenRelationsFilePath);
-                                   }));
+    utils::runAsync([this, childrenFilePath]()
+                       {
+                           m_childrenNames.read(childrenFilePath);
+                       });
+    utils::runAsync([this, childrenRelationsFilePath]()
+                       {
+                           m_childrenRelations.read(childrenRelationsFilePath);
+                       });
 }
 
 StringList ProcessDataFacade::unlovedChildrenNames() const
@@ -168,9 +168,6 @@ StringList ProcessDataFacade::favouriteChildrenNames() const
 
 void ProcessDataFacade::run()
 {
-    for (auto & future : m_futures)
-        future.get();
-
     const std::string menu = R"(
 Select action:
     "1 - Unloved children"

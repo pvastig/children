@@ -61,7 +61,5 @@ public:
 private:
     ChildrenNames m_childrenNames;
     ChildrenRelations m_childrenRelations;
-
-    std::vector<std::future<void>> m_futures;
 };
 }

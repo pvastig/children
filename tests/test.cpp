@@ -194,15 +194,14 @@ void concurrencyReading()
         totalTime.start();
 
         START_TIME;
-        fut1 = std::async([fileNames]() { ChildrenNames().read(fileNames); });
+        fut1 = runAsync([fileNames]() { ChildrenNames().read(fileNames); });
         STOP_TIME;
         PRINT_DURATION_TIME("First thread: ");
 
         START_TIME;
-        fut2 = std::async([]() { ChildrenRelations().read(argv[2]);});
+        fut2 = runAsync([]() { ChildrenRelations().read(argv[2]);});
         STOP_TIME;
         PRINT_DURATION_TIME("Second thread: ");
-
 
         START_TIME;
         fut1.get();
