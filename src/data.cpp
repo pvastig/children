@@ -97,20 +97,18 @@ ProcessDataFacade::ProcessDataFacade(int argc, char const ** argv)
     };
     std::string_view childrenFilePath = argv[1];
     if (wrongFilePath(childrenFilePath))
-        throw std::invalid_argument(childrenFilePath.data());
+        throw std::invalid_argument(childrenFilePath.data() + std::string(" does not exist"));
 
     std::string_view childrenRelationsFilePath = argv[2];
     if (wrongFilePath(childrenRelationsFilePath))
-        throw std::invalid_argument(childrenRelationsFilePath.data());
+        throw std::invalid_argument(childrenRelationsFilePath.data() +  std::string(" does not exist"));
 
-    utils::runAsync([this, childrenFilePath]()
+    auto future = utils::runAsync([this, childrenFilePath]()
                        {
                            m_childrenNames.read(childrenFilePath);
                        });
-    utils::runAsync([this, childrenRelationsFilePath]()
-                       {
-                           m_childrenRelations.read(childrenRelationsFilePath);
-                       });
+    future.get();
+    m_childrenRelations.read(childrenRelationsFilePath);
 }
 
 StringList ProcessDataFacade::unlovedChildrenNames() const
@@ -200,6 +198,7 @@ Select action:
         switch (static_cast<UserSelect>(num))
         {
         case UserSelect::UnlovedChildrenNames:
+            //TODO: instead of printing to console, print to file?
             utils::printContainer(unlovedChildrenNames());
             break;
         case UserSelect::UnhappyChildrenNames:
