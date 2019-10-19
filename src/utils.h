@@ -12,26 +12,18 @@ namespace utils
 constexpr char const * newLine = "\n";
 #define PRINT_DASHED_LINE std::cout << "--------------" << std::endl
 
-template<class T>
-void print(T arg)
-{
-    std::ios::sync_with_stdio(false);
-    std::cout << arg;
-}
-
-template<class T, typename... Args>
-void print(T firstArg, Args&&... args)
-{
-    print(firstArg);
-    print(args...);
+template <typename... Args>
+void print(Args&&... args) {
+  std::ios::sync_with_stdio(false);
+  (std::cout << ... << std::forward<Args>(args));
 }
 
 template<class Container>
 void printContainer(Container&& container)
 {
     PRINT_DASHED_LINE;
-    for (auto const & item : std::forward<Container>(container))
-        print(item, newLine);
+    for (auto const& item : std::forward<Container>(container))
+      print(item, newLine);
     PRINT_DASHED_LINE;
 }
 
@@ -63,9 +55,12 @@ void printComplexContainer(T container)
 }
 
 template<class T>
-class Singleton
+class Singleton final
 {
 public:
+    Singleton & operator=(Singleton) = delete;
+    Singleton(Singleton const &)     = delete;
+
     static T & instance()
     {
         static T object;
