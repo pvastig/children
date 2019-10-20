@@ -167,10 +167,10 @@ StringList ProcessDataFacade::favouriteChildrenNames() const
 void ProcessDataFacade::run() {
   const std::string menu = R"(
 Select action:
-    "1 - Unloved children"
-    "2 - Unhappy children"
-    "3 - Favorite children"
-    "------------------------"
+    1 - Unloved children
+    2 - Unhappy children
+    3 - Favorite children
+    ------------------------
      0 - exit
 ===> )";
 
