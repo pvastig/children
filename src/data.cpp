@@ -164,9 +164,8 @@ StringList ProcessDataFacade::favouriteChildrenNames() const
     return results;
 }
 
-void ProcessDataFacade::run()
-{
-    const std::string menu = R"(
+void ProcessDataFacade::run() {
+  const std::string menu = R"(
 Select action:
     "1 - Unloved children"
     "2 - Unhappy children"
@@ -175,46 +174,50 @@ Select action:
      0 - exit
 ===> )";
 
-    enum class UserSelect : char
-    {
-        Exit,
-        UnlovedChildrenNames,
-        UnhappyChildrenNames,
-        FavouriteChildrenNames
-    };
-    bool readAgain = true;
-    do
-    {
-        utils::print(menu);
-        int num = 0;
-        std::cin >> num;
-        if (!std::cin)
-        {
-            std::cin.clear();
-            std::string s;
-            std::cin >> s;
-            num = -1;
-        }
-        switch (static_cast<UserSelect>(num))
-        {
-        case UserSelect::UnlovedChildrenNames:
-            //TODO: instead of printing to console, print to file?
-            utils::printContainer(unlovedChildrenNames());
-            break;
-        case UserSelect::UnhappyChildrenNames:
-            utils::printContainer(unhappyChildrenNames());
-            break;
-        case UserSelect::FavouriteChildrenNames:
-            utils::printContainer(favouriteChildrenNames());
-            break;
-        case UserSelect::Exit:
-            utils::print("Bye-bye :)", utils::newLine);
-            readAgain = false;
-            break;
-        default:
-            utils::print("You entered not existed action, please, try again :)", utils::newLine);
-            break;
-        }
-    } while (readAgain);
+  enum class UserSelect : char {
+    Exit,
+    UnlovedChildrenNames,
+    UnhappyChildrenNames,
+    FavouriteChildrenNames
+  };
+  bool readAgain = true;
+  do {
+    std::cout << menu;
+    int num = 0;
+    std::cin >> num;
+    if (!std::cin) {
+      std::cin.clear();
+      std::string s;
+      std::cin >> s;
+      num = -1;
+    }
+    switch (static_cast<UserSelect>(num)) {
+      case UserSelect::UnlovedChildrenNames:
+        // TODO: instead of printing to console, print to file?
+        std::cout << unlovedChildrenNames();
+        break;
+      case UserSelect::UnhappyChildrenNames:
+        std::cout << unhappyChildrenNames();
+        break;
+      case UserSelect::FavouriteChildrenNames:
+        std::cout << favouriteChildrenNames();
+        break;
+      case UserSelect::Exit:
+        std::cout << "Bye-bye :)" << utils::newLine;
+        readAgain = false;
+        break;
+      default:
+        std::cout << "You entered not existed action, please, try again:)"
+                  << std::endl;
+        break;
+    }
+  } while (readAgain);
 }
+
+std::ostream &operator<<(std::ostream &os, const StringList &container) {
+  os << "(\n";
+  // TODO: thinking about setting width output
+  utils::print(os, container);
+  return os << ")";
 }
+}  // namespace pa

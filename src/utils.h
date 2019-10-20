@@ -2,42 +2,18 @@
 
 #include <algorithm>
 #include <chrono>
-#include <future>
 #include <fstream>
+#include <future>
 #include <iostream>
 #include <string_view>
+#include <type_traits>
 
 namespace utils
 {
 constexpr char const * newLine = "\n";
 #define PRINT_DASHED_LINE std::cout << "--------------" << std::endl
 
-template <typename... Args>
-void print(Args&&... args) {
-  std::ios::sync_with_stdio(false);
-  (std::cout << ... << std::forward<Args>(args));
-}
-
-template<class Container>
-void printContainer(Container&& container)
-{
-    PRINT_DASHED_LINE;
-    for (auto const& item : std::forward<Container>(container))
-      print(item, newLine);
-    PRINT_DASHED_LINE;
-}
-
-//TODO: make overload of template
-template<class Map>
-void printMap(Map container)
-{
-    PRINT_DASHED_LINE;
-    for (auto const & [first, second] : container)
-        print(first, ' ', second, newLine);
-    PRINT_DASHED_LINE;
-}
-
-//TODO: improve template. leave comment about working
+// TODO: improve template. leave comment about working
 template<class T>
 void printComplexContainer(T container)
 {
@@ -115,5 +91,53 @@ auto runAsync(F&& f, Ts&&... params)
 {
     return std::async(std::launch::async, std::forward<F>(f), std::forward<Ts>(params)...);
 }
+
+template <class Out, typename... Args>
+auto& print(Out& out, Args... args) {
+  return (out << ... << args);
 }
 
+// templates for determining whether the std::pair container element is
+template <typename T>
+struct isPair : std::false_type {};
+
+template <typename T, typename U>
+struct isPair<std::pair<T, U>> : std::true_type {};
+
+template <typename T>
+constexpr bool isPairV = isPair<T>::value;
+
+// templates for determining if the container is std::map
+template <typename, typename = void>
+struct isMapping : std::false_type {};
+
+template <typename Container>
+struct isMapping<Container,
+                 std::enable_if_t<isPairV<typename std::iterator_traits<
+                     typename Container::iterator>::value_type>>>
+    : std::true_type {};
+
+template <typename T>
+constexpr bool isMappingV = isMapping<T>::value;
+template <class Out, class Container>
+typename std::enable_if_t<isMappingV<Container>, void> print(
+    Out& out, Container&& container);
+
+template <class Out, class Container>
+typename std::enable_if_t<!isMappingV<Container>, void> print(
+    Out& out, Container&& container);
+
+template <class Out, class Container>
+typename std::enable_if_t<!isMappingV<Container>> print(Out& out,
+                                                        Container&& container) {
+  for (auto&& item : std::forward<Container>(container))
+    out << item << newLine;
+}
+
+template <class Out, class Container>
+typename std::enable_if_t<isMappingV<Container>, void> print(
+    Out& out, Container&& container) {
+  for (auto&& [first, second] : std::forward<Container>(container))
+    out << first << " " << second;
+}
+}  // namespace utils

@@ -1,10 +1,9 @@
 #pragma once
 
-#include <future>
 #include <forward_list>
+#include <ostream>
 #include <string>
 #include <string_view>
-#include <vector>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -62,4 +61,6 @@ private:
     ChildrenNames m_childrenNames;
     ChildrenRelations m_childrenRelations;
 };
-}
+
+std::ostream& operator<<(std::ostream& os, StringList const& container);
+}  // namespace pa
