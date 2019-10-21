@@ -5,6 +5,7 @@
 
 #include <future>
 #include <set>
+#include <type_traits>
 
 namespace Test {
 template <class... Args>
@@ -21,25 +22,41 @@ static char const* argv[]            = {"dummy", "../names.dat",
 constexpr int argc                   = 3;
 constexpr char const* strDataReading = "Data reading: ";
 constexpr char const* strFuncExec    = "Execution: ";
+using StringSet                      = std::set<std::string>;
 
-template <class T1, class T2>
-void compareContainers(T1 referenceContainer, T2 comparedContainer,
-                       int lineError) {
-  // TODO: if container has size, use size, otherwise use distance
-  auto const size1 =
-      std::distance(referenceContainer.cbegin(), referenceContainer.cend());
-  auto const size2 =
-      std::distance(comparedContainer.cbegin(), comparedContainer.cend());
+template <typename T, typename = void>
+struct HasSize : std::false_type {};
+
+template <typename T>
+struct HasSize<T, std::enable_if_t<std::is_same<
+                      decltype(std::declval<T>().size()), size_t>::value>>
+    : std::true_type {};
+
+template <typename T>
+constexpr bool HasSizeV = HasSize<T>::value;
+
+template <class ReferenceContainer, class ComparedContainer>
+void compareContainers(ReferenceContainer refContainer,
+                       ComparedContainer cmpContainer, int lineError) {
+  int size1 = 0;
+  int size2 = 0;
+  if constexpr (HasSizeV<ReferenceContainer> && HasSizeV<ComparedContainer>) {
+    size1 = refContainer.size();
+    size2 = cmpContainer.size();
+  } else {
+    size1 = std::distance(refContainer.cbegin(), refContainer.cend());
+    size2 = std::distance(cmpContainer.cbegin(), cmpContainer.cend());
+  }
   if (size1 != size2) {
-    print(comparedContainer);
+    print(cmpContainer);
     throw std::length_error("Line: " + std::to_string(lineError) +
                             ". Reference size: " + std::to_string(size1) +
                             ". Compared size: " + std::to_string(size2));
   }
-  for (auto it1 = referenceContainer.cbegin(), it2 = comparedContainer.cbegin();
-       it1 != referenceContainer.cend(); ++it1, ++it2) {
+  for (auto it1 = refContainer.cbegin(), it2 = cmpContainer.cbegin();
+       it1 != refContainer.cend(); ++it1, ++it2) {
     if (*it1 != *it2) {
-      print(comparedContainer);
+      print(cmpContainer);
       throw std::logic_error("Line: " + std::to_string(lineError) +
                              ". Reference name: " + *it1 +
                              ". Compared name: " + *it2);
@@ -90,23 +107,15 @@ void readDataRelations() {
 
   auto const& name2RelatedNames = childrenRelations.name2RelatedNames();
   StringList readNames;
-  std::set<std::string> relatedNames;
+  StringSet relatedNames;
   for (auto const& [name, relatedName] : name2RelatedNames) {
     readNames.push_front(name);
     relatedNames.insert(relatedName.cbegin(), relatedName.cend());
   }
 
-  StringUnordMap const referenceNames = {
-      {"Vasya", {"Masha", "Oleg", "123Georg"}},
-      {"Masha", {"Petya", "Oleg", "Katya"}},
-      {"Katya", {"Masha"}},
-      {"Oleg", {"Masha"}}};
-  StringList refNames;
-  std::set<std::string> refRelatedNames;
-  for (auto const& [name, relatedName] : referenceNames) {
-    refNames.push_front(name);
-    refRelatedNames.insert(relatedName.cbegin(), relatedName.cend());
-  }
+  StringList const refNames{"Vasya", "Masha", "Katya", "Oleg"};
+  StringSet const refRelatedNames{"Masha", "Oleg", "123Georg", "Petya",
+                                  "Katya"};
 
   compareContainers(refNames, readNames, FILE_LINE);
   compareContainers(refRelatedNames, relatedNames, FILE_LINE);
@@ -178,7 +187,6 @@ void concurrencyReading() {
   // TODO: make big files to check times
   PRINT_FUNC_NAME;
   std::string_view fileNames = "../names_cuncurrency_test.dat";
-
   {
     print("Without cuncurrency:", newLine);
     Timer totalTime;
@@ -189,7 +197,6 @@ void concurrencyReading() {
       STOP_TIME;
       PRINT_DURATION_TIME("First reading: ");
     }
-
     {
       START_TIME;
       ChildrenRelations().read(argv[2]);
@@ -213,7 +220,6 @@ void concurrencyReading() {
 
     START_TIME;
     ChildrenRelations().read(argv[2]);
-    ;
     STOP_TIME;
     PRINT_DURATION_TIME("Second thread: ");
 
