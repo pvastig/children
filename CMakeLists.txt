@@ -29,9 +29,3 @@ file(GLOB AUTO_SOURCES "src/*.cpp" "src/*.h")
 
 add_executable(${PROJECT} ${AUTO_SOURCES})
 target_link_libraries(${PROJECT} Threads::Threads)
-
-if(MSVC)
-    target_compile_options(${PROJECT} PRIVATE /W4 /WX)
-else()
-    target_compile_options(${PROJECT} PRIVATE -Wall -Wextra -pedantic -Werror)
-endif()

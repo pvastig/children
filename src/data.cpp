@@ -10,221 +10,239 @@
 #include <vector>
 
 namespace pa {
-DataFile::~DataFile() = default;
 
-Warnings ChildrenNames::read(std::string_view fileName) {
-  std::ifstream ifs(fileName.data());
-  assert(ifs.is_open());
-  if (!ifs.is_open())
-    return {};
+DataFile::DataFile(std::string_view fileName) : m_fileName(fileName) {}
 
-  // TODO: add checking if line contains 2 or more words
-  std::string line;
-  // TODO: improve reading using chunks, take a look at boost?
-  Warnings warnings;
-  while (std::getline(ifs, line)) {
-    ++m_countLines;
-    if (line.empty()) {
-      warnings.push_back(std::to_string(m_countLines) + " is empty");
-      continue;
-    }
+void DataFile::logWarnings()
+{
+    if (m_warnings.empty())
+        return;
 
-    if (auto [it, inserted] = m_childrenNames.insert(line); !inserted)
-      warnings.push_back(std::to_string(m_countLines) +
-                         " has duplicated data : " + line);
-  }
-
-  return warnings;
-}
-
-Warnings ChildrenRelations::read(std::string_view fileName) {
-  std::ifstream ifs(fileName.data(), std::ios_base::in);
-  assert(ifs.is_open());
-  if (!ifs.is_open())
-    return {};
-
-  std::string line;
-  Warnings warnings;
-  while (std::getline(ifs, line)) {
-    ++m_countLines;
-    if (line.empty()) {
-      warnings.push_back(std::to_string(m_countLines) + " is empty");
-      continue;
-    }
-
-    // TODO: add check if line contains one word or more than 2 words
-    std::istringstream iss(line);
-    std::string word1, word2;
-    // TODO: investigate this case
-    if (!(iss >> word1 >> word2)) {
-      warnings.push_back(std::to_string(m_countLines) +
-                         " has invalid data: " + line);
-      continue;
-    }
-    // The case is from task
-    if (word1 == word2) {
-      warnings.push_back(std::to_string(m_countLines) +
-                         " has same words: " + line);
-      continue;
-    }
-
-    m_name2RelatedNames[word1].insert(word2);
-  }
-
-  return warnings;
-}
-
-ProcessDataFacade::ProcessDataFacade(int argc, char const** argv) {
-  // TODO: split on functions
-  // bool logToFile = false;
-  if (argc == 4) {
-    // TODO: make possibility process arguments and make help for them
-    if (argv[3] == std::string("--log")) {
-    }
-  } else if (argc != 3)
-    throw std::invalid_argument("You should input 2 files");
-
-  namespace fs       = std::filesystem;
-  auto wrongFilePath = [](std::string_view str) {
-    fs::path filePath(str);
-    return !fs::exists(filePath) || !filePath.has_filename();
-  };
-  std::string_view childrenFilePath = argv[1];
-  if (wrongFilePath(childrenFilePath))
-    throw std::invalid_argument(childrenFilePath.data() +
-                                std::string(" does not exist"));
-
-  std::string_view childrenRelationsFilePath = argv[2];
-  if (wrongFilePath(childrenRelationsFilePath))
-    throw std::invalid_argument(childrenRelationsFilePath.data() +
-                                std::string(" does not exist"));
-
-  m_file2Data.insert_or_assign(childrenFilePath,
-                               utils::runAsync([this, childrenFilePath]() {
-                                 return m_childrenNames.read(childrenFilePath);
-                               }));
-
-  m_file2Data.insert_or_assign(
-      childrenRelationsFilePath,
-      utils::runAsync([this, childrenRelationsFilePath]() {
-        return m_childrenRelations.read(childrenRelationsFilePath);
-      }));
-}
-
-StringList ProcessDataFacade::unlovedChildrenNames() const {
-  auto const& chilrenNames   = m_childrenNames.names();
-  auto const& name2Relations = m_childrenRelations.name2RelatedNames();
-  auto foundHappyName        = [&name2Relations](auto const& childrenName) {
-    for (auto const& [dummy, name2Relation] : name2Relations)
-      if (name2Relation.find(childrenName) != name2Relation.cend())
-        return true;
-    return false;
-  };
-  StringList result;
-  for (auto const& childrenName : chilrenNames)
-    if (!foundHappyName(childrenName))
-      result.push_front(childrenName);
-
-  return result;
-}
-
-StringList ProcessDataFacade::unhappyChildrenNames() const {
-  auto const& name2Relations = m_childrenRelations.name2RelatedNames();
-  auto foundHappyName        = [&name2Relations](auto const& childrenName) {
-    for (auto const& [dummy, name2Relation] : name2Relations)
-      if (name2Relation.find(childrenName) != name2Relation.cend())
-        return true;
-    return false;
-  };
-  StringList results;
-  for (auto const& [childrenName, dummy] : name2Relations)
-    if (!foundHappyName(childrenName))
-      results.push_front(childrenName);
-
-  return results;
-}
-
-StringList ProcessDataFacade::favouriteChildrenNames() const {
-  auto const& name2RelatedNames = m_childrenRelations.name2RelatedNames();
-  std::unordered_map<std::string, size_t> favoriteName2Count;
-  for (auto const& [dummy, relatedNames] : name2RelatedNames)
-    for (auto const& relatedName : relatedNames)
-      ++favoriteName2Count[relatedName];
-
-  StringList results;
-  for (auto const& [name, count] : favoriteName2Count)
-    if (size_t const filter = 1; count > filter)
-      results.push_front(name + ": " + std::to_string(count));
-
-  return results;
-}
-
-void ProcessDataFacade::collectAndLogData() {
-  for (auto&& [fileName, futureRes] : m_file2Data) {
-    auto warnings = futureRes.get();
-    if (m_logToFile && !warnings.empty()) {
-      utils::Log logToFile(fileName.data());
-      for (auto const& warning : warnings)
+    utils::Log logToFile(m_fileName.data());
+    for (auto const& warning : m_warnings)
         logToFile << warning;
-    }
-  }
 }
 
-void ProcessDataFacade::run() {
-  collectAndLogData();
+ChildrenNamesFile::ChildrenNamesFile(std::string_view fileName) : DataFile(fileName) {}
 
-  std::string_view menu = R"(
-Select action:
+bool ChildrenNamesFile::read()
+{
+    // TODO: take into account binary mode
+    std::ifstream ifs(m_fileName.data());
+    assert(ifs.is_open());
+    if (!ifs.is_open())
+        return false;
+
+    // TODO: add checking if line contains 2 or more words
+    std::string line;
+    // TODO: improve reading using chunks, take a look at boost?
+    WarningVector warnings;
+    while (std::getline(ifs, line)) {
+        ++m_countLines;
+        if (line.empty()) {
+            warnings.emplace_back(std::to_string(m_countLines) + " is empty");
+            continue;
+        }
+
+        if (auto [it, inserted] = m_childrenNames.insert(line); !inserted)
+            warnings.emplace_back(std::to_string(m_countLines) + " has duplicated data : " + line);
+    }
+    m_warnings = std::move(warnings);
+    return m_warnings.empty();
+}
+
+ChildrenRelationsFile::ChildrenRelationsFile(std::string_view fileName) : DataFile(fileName) {}
+
+bool ChildrenRelationsFile::read()
+{
+    std::ifstream ifs(m_fileName.data());
+    assert(ifs.is_open());
+    if (!ifs.is_open())
+        return false;
+
+    std::string line;
+    WarningVector warnings;
+    while (std::getline(ifs, line)) {
+        ++m_countLines;
+        if (line.empty()) {
+            warnings.emplace_back(std::to_string(m_countLines) + " is empty");
+            continue;
+        }
+
+        // TODO: add check if line contains one word or more than 2 words
+        std::istringstream iss(line);
+        std::string word1, word2;
+        // TODO: investigate this case
+        if (!(iss >> word1 >> word2)) {
+            warnings.emplace_back(std::to_string(m_countLines) + " has invalid data: " + line);
+            continue;
+        }
+        // The case is from task
+        if (word1 == word2) {
+            warnings.push_back(std::to_string(m_countLines) + " has same words: " + line);
+            continue;
+        }
+        m_name2RelatedNames[word1].insert(word2);
+    }
+    m_warnings = std::move(warnings);
+    return m_warnings.empty();
+}
+
+ProcessDataFacade::ProcessDataFacade(int argc, char const** argv)
+{
+    if (argc == 4) {
+        // TODO: make possibility process arguments and make help for them
+        if (argv[3] == std::string("--log")) {
+            m_logToFile = true;
+        }
+    } else if (argc != 3)
+        throw std::invalid_argument("You should input 2 files");
+
+    namespace fs = std::filesystem;
+    auto wrongFilePath = [](std::string_view str) {
+        fs::path filePath(str);
+        return !fs::exists(filePath) || !filePath.has_filename();
+    };
+    std::string_view childrenFilePath = argv[1];
+    if (wrongFilePath(childrenFilePath))
+        throw std::invalid_argument(childrenFilePath.data() + std::string(" does not exist"));
+
+    std::string_view childrenRelationsFilePath = argv[2];
+    if (wrongFilePath(childrenRelationsFilePath))
+        throw std::invalid_argument(childrenRelationsFilePath.data()
+                                    + std::string(" does not exist"));
+
+    m_dataFile.emplace_back(std::make_unique<ChildrenNamesFile>(childrenFilePath));
+    m_dataFile.emplace_back(std::make_unique<ChildrenRelationsFile>(childrenRelationsFilePath));
+}
+
+void ProcessDataFacade::run() const
+{
+    auto const result = readData();
+    DisplayData(result).run();
+}
+
+ResultVector ProcessDataFacade::readData() const
+{
+    ResultVector result;
+    for (auto&& item : m_dataFile) {
+        utils::runAsync([&item]() { item->read(); }).get();
+        result.emplace_back(item->result());
+    }
+    if (m_logToFile) {
+        for (auto&& item : m_dataFile)
+            item->logWarnings();
+    }
+    return result;
+}
+
+// TODO: if size of result will be increased then it should use std::visit
+DisplayData::DisplayData(ResultVector const& result)
+try : m_childrenNames(std::get<decltype(m_childrenNames)>(result.at(0))),
+      m_name2RelatedNames(std::get<decltype(m_name2RelatedNames)>(result.at(1))) {
+} catch (std::exception& e) {
+    throw std::invalid_argument(e.what());
+}
+
+void DisplayData::run() const
+{
+    std::string_view menu = R"(
+    Select action:
     1 - Unloved children
     2 - Unhappy children
     3 - Favorite children
-    ------------------------
+    ----------------------
     0 - exit
 ==> )";
 
-  enum class UserSelect : char {
-    Exit,
-    UnlovedChildrenNames,
-    UnhappyChildrenNames,
-    FavouriteChildrenNames
-  };
-  bool readAgain = true;
-  do {
-    std::cout << menu;
-    int num = -1;
-    std::cin >> num;
-    if (!std::cin) {
-      std::cin.clear();
-      std::string s;
-      std::cin >> s;
-    }
-    switch (static_cast<UserSelect>(num)) {
-    case UserSelect::UnlovedChildrenNames:
-      // TODO: instead of printing to console, print to file?
-      std::cout << unlovedChildrenNames();
-      break;
-    case UserSelect::UnhappyChildrenNames:
-      std::cout << unhappyChildrenNames();
-      break;
-    case UserSelect::FavouriteChildrenNames:
-      std::cout << favouriteChildrenNames();
-      break;
-    case UserSelect::Exit:
-      std::cout << "Bye-bye :)" << utils::newLine;
-      readAgain = false;
-      break;
-    default:
-      std::cout << "You entered not existed action, please, try again:)"
-                << std::endl;
-      break;
-    }
-  } while (readAgain);
+    enum class UserSelect : char {
+        Exit,
+        UnlovedChildrenNames,
+        UnhappyChildrenNames,
+        FavouriteChildrenNames
+    };
+    bool readAgain = true;
+    do {
+        std::cout << menu;
+        int num = -1;
+        std::cin >> num;
+        if (!std::cin) {
+            std::cin.clear();
+            std::string s;
+            std::cin >> s;
+        }
+        switch (static_cast<UserSelect>(num)) {
+        case UserSelect::UnlovedChildrenNames:
+            // TODO: instead of printing to console, print to file?
+            std::cout << unlovedChildrenNames(m_childrenNames, m_name2RelatedNames);
+            break;
+        case UserSelect::UnhappyChildrenNames:
+            std::cout << unhappyChildrenNames(m_name2RelatedNames);
+            break;
+        case UserSelect::FavouriteChildrenNames:
+            std::cout << favoriteChildrenNames(m_name2RelatedNames);
+            break;
+        case UserSelect::Exit:
+            std::cout << "Bye-bye :)" << utils::newLine;
+            readAgain = false;
+            break;
+        default:
+            std::cout << "You entered not existed action, please, try again:)" << std::endl;
+            break;
+        }
+    } while (readAgain);
 }
 
-std::ostream& operator<<(std::ostream& os, const StringList& container) {
-  os << "(\n";
-  // TODO: thinking about setting width output
-  utils::print(os, container);
-  return os << ")";
+StringList unlovedChildrenNames(StringUnordSet const& childrenNames,
+                                StringUnordMap const& name2RelatedNames)
+{
+    auto foundHappyName = [&name2RelatedNames](auto const& childrenName) {
+        for (auto const& [dummy, name2Relation] : name2RelatedNames)
+            if (name2Relation.find(childrenName) != name2Relation.cend())
+                return true;
+        return false;
+    };
+    StringList result;
+    for (auto const& childrenName : childrenNames)
+        if (!foundHappyName(childrenName))
+            result.push_front(childrenName);
+    return result;
+}
+
+StringList unhappyChildrenNames(StringUnordMap const& name2RelatedNames)
+{
+    auto foundHappyName = [&name2RelatedNames](auto const& childrenName) {
+        for (auto const& [dummy, name2Relation] : name2RelatedNames)
+            if (name2Relation.find(childrenName) != name2Relation.cend())
+                return true;
+        return false;
+    };
+    StringList results;
+    for (auto const& [childrenName, dummy] : name2RelatedNames)
+        if (!foundHappyName(childrenName))
+            results.push_front(childrenName);
+    return results;
+}
+
+StringList favoriteChildrenNames(StringUnordMap const& name2RelatedNames)
+{
+    std::unordered_map<std::string, size_t> favoriteName2Count;
+    for (auto const& [dummy, relatedNames] : name2RelatedNames)
+        for (auto const& relatedName : relatedNames)
+            ++favoriteName2Count[relatedName];
+
+    StringList results;
+    for (auto const& [name, count] : favoriteName2Count)
+        if (size_t const filter = 1; count > filter)
+            results.push_front(name + ": " + std::to_string(count));
+    return results;
+}
+
+std::ostream& operator<<(std::ostream& os, StringList const& container)
+{
+    os << "(\n";
+    // TODO: thinking about setting width output
+    utils::print(os, container);
+    return os << ")";
 }
 } // namespace pa

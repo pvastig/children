@@ -4,26 +4,19 @@
 
 int main()
 {
-    try
-    {
+    try {
         using namespace Test;
-        //readDataNames();
-        //readDataRelations();
-        //unlovedChildren();
-        //unhappyChildren();
-        //favouriteChildren();
+        //        readChildrenNames();
+        //        readChildrenRelations();
+        //        unlovedChildren();
+        //        unhappyChildren();
+        //        favoriteChildren();
         all();
-        //testLog();
-        //testConcurrencyReading();
-        return 0;
+        // testConcurrencyReading();
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "Unknown error" << std::endl;
     }
-    catch (const std::exception& e)
-    {
-        std::cerr  << e.what();
-    }
-    catch (...)
-    {
-        std::cerr << "Unknown error";
-    }
-    return 1;
+    return 0;
 }

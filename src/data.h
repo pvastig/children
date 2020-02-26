@@ -1,73 +1,92 @@
 #pragma once
 
 #include <forward_list>
-#include <future>
+#include <memory>
 #include <ostream>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
 namespace pa {
-using Warnings = std::vector<std::string>;
 
-class DataFile {
-public:
-  virtual ~DataFile();
-  virtual Warnings read(std::string_view fileName) = 0;
-
-protected:
-  size_t m_countLines = 0;
-};
-
-using StringList     = std::forward_list<std::string>;
+using WarningVector = std::vector<std::string>;
+using StringList = std::forward_list<std::string>;
 using StringUnordSet = std::unordered_set<std::string>;
 using StringUnordMap = std::unordered_map<std::string, StringUnordSet>;
+using ResultVariant = std::variant<StringUnordSet, StringUnordMap>;
+using ResultVector = std::vector<ResultVariant>;
 
-class ChildrenNames : public DataFile {
+class DataFile
+{
 public:
-  Warnings read(std::string_view fileName) override;
-  auto const& names() const {
-    return m_childrenNames;
-  }
+    explicit DataFile(std::string_view fileName);
+    virtual ~DataFile() = default;
+    virtual bool read() = 0;
+    virtual void logWarnings();
+    virtual ResultVariant result() const = 0;
 
-private:
-  StringUnordSet m_childrenNames;
+protected:
+    size_t m_countLines = 0;
+    WarningVector m_warnings;
+    std::string m_fileName;
 };
 
-class ChildrenRelations : public DataFile {
+class ChildrenNamesFile : public DataFile
+{
 public:
-  Warnings read(std::string_view fileName) override;
-  auto const& name2RelatedNames() const {
-    return m_name2RelatedNames;
-  }
+    explicit ChildrenNamesFile(std::string_view fileName);
+    bool read() override;
+    ResultVariant result() const override { return m_childrenNames; }
+    StringUnordSet const& childrenNames() const { return m_childrenNames; }
 
 private:
-  StringUnordMap m_name2RelatedNames;
+    StringUnordSet m_childrenNames;
 };
 
-class ProcessDataFacade {
+class ChildrenRelationsFile : public DataFile
+{
 public:
-  ProcessDataFacade(int argc, char const** argv);
-  void run();
-
-  // list of unloved children
-  StringList unlovedChildrenNames() const;
-  // list of unhappy children
-  StringList unhappyChildrenNames() const;
-  // list of favorite children
-  StringList favouriteChildrenNames() const;
+    explicit ChildrenRelationsFile(std::string_view fileName);
+    bool read() override;
+    ResultVariant result() const override { return m_name2RelatedNames; }
+    StringUnordMap const& name2RelatedNames() const { return m_name2RelatedNames; }
 
 private:
-  ChildrenNames m_childrenNames;
-  ChildrenRelations m_childrenRelations;
-
-private:
-  std::unordered_map<std::string_view, std::future<Warnings>> m_file2Data;
-  void collectAndLogData();
-  bool m_logToFile = false;
+    StringUnordMap m_name2RelatedNames;
 };
+
+class ProcessDataFacade
+{
+public:
+    ProcessDataFacade(int argc, char const** argv);
+    void run() const;
+
+private:
+    ResultVector readData() const;
+
+private:
+    std::vector<std::unique_ptr<DataFile>> m_dataFile;
+    bool m_logToFile = false;
+};
+
+class DisplayData
+{
+public:
+    DisplayData(ResultVector const& result);
+    void run() const;
+
+private:
+    StringUnordSet m_childrenNames;
+    StringUnordMap m_name2RelatedNames;
+};
+
+StringList unlovedChildrenNames(StringUnordSet const& childrenNames,
+                                StringUnordMap const& name2RelatedNames);
+StringList unhappyChildrenNames(StringUnordMap const& name2RelatedNames);
+StringList favoriteChildrenNames(StringUnordMap const& name2RelatedNames);
 
 std::ostream& operator<<(std::ostream& os, StringList const& container);
 } // namespace pa
