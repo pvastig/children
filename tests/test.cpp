@@ -1,6 +1,7 @@
 #include "test.h"
 
-#include "../src/data.h"
+#include "../src/data_file.h"
+#include "../src/parse_result.h"
 #include "../src/utils.h"
 
 #include <future>

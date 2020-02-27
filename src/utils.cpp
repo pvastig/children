@@ -37,4 +37,5 @@ Log::~Log()
     if (m_outputFile.is_open())
         m_outputFile.close();
 }
+
 } // namespace utils

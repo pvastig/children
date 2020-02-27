@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <chrono>
 #include <fstream>
 #include <future>
@@ -133,4 +132,5 @@ typename std::enable_if_t<isMappingV<Container>, void> print(Out& out, Container
     for (auto&& [first, second] : std::forward<Container>(container))
         out << first << " " << second;
 }
+
 } // namespace utils

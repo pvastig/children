@@ -1,29 +1,18 @@
 #pragma once
 
-#include <forward_list>
+#include "user_types.h"
+
 #include <memory>
-#include <ostream>
-#include <string>
-#include <string_view>
-#include <unordered_map>
-#include <unordered_set>
-#include <variant>
-#include <vector>
 
 namespace pa {
 
-using WarningVector = std::vector<std::string>;
-using StringList = std::forward_list<std::string>;
-using StringUnordSet = std::unordered_set<std::string>;
-using StringUnordMap = std::unordered_map<std::string, StringUnordSet>;
-using ResultVariant = std::variant<StringUnordSet, StringUnordMap>;
-using ResultVector = std::vector<ResultVariant>;
+struct ParsedResult;
 
 class DataFile
 {
 public:
     explicit DataFile(std::string_view fileName);
-    virtual ~DataFile() = default;
+    virtual ~DataFile();
     virtual bool read() = 0;
     virtual void logWarnings();
     virtual ResultVariant result() const = 0;
@@ -58,51 +47,11 @@ private:
     StringUnordMap m_name2RelatedNames;
 };
 
-class ProcessDataFacade
-{
-public:
-    ProcessDataFacade(int argc, char const** argv);
-    void run() const;
-
-private:
-    ResultVector readData() const;
-
-private:
-    std::vector<std::unique_ptr<DataFile>> m_dataFile;
-    bool m_logToFile = false;
-};
-
-struct ParsedResult
-{
-    StringUnordSet childrenNames;
-    StringUnordMap name2RelatedNames;
-    size_t size = 0;
-};
-
-class ParseResult
-{
-public:
-    ParseResult(ResultVector const& result);
-    ParsedResult parse();
-
-private:
-    ResultVector m_result;
-};
-
-class DisplayData
-{
-public:
-    DisplayData(ParsedResult const& result);
-    void run() const;
-
-private:
-    ParsedResult m_result;
-};
-
 StringList unlovedChildrenNames(StringUnordSet const& childrenNames,
                                 StringUnordMap const& name2RelatedNames);
 StringList unhappyChildrenNames(StringUnordMap const& name2RelatedNames);
 StringList favoriteChildrenNames(StringUnordMap const& name2RelatedNames);
 
 std::ostream& operator<<(std::ostream& os, StringList const& container);
+
 } // namespace pa

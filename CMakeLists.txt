@@ -28,4 +28,6 @@ find_package(Threads REQUIRED)
 file(GLOB AUTO_SOURCES "src/*.cpp" "src/*.h")
 
 add_executable(${PROJECT} ${AUTO_SOURCES})
+#TODO: add precompiled header
+#target_precompile_headers(${PROJECT} PRIVATE src/user_types.h)
 target_link_libraries(${PROJECT} Threads::Threads)

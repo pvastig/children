@@ -1,6 +1,7 @@
 #pragma once
 
 namespace Test {
+
 void readChildrenNames();
 void readChildrenRelations();
 void unlovedChildren();
@@ -10,4 +11,5 @@ void concurrencyReading();
 void parseResult();
 
 void all();
+
 } // namespace Test
