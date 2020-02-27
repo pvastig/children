@@ -20,7 +20,7 @@ void print(Args... args)
 
 #define PRINT_DURATION_TIME(str) print(str, DURATION_TIME, newLine)
 #define FILE_LINE __LINE__
-#define PRINT_FUNC_NAME print(newLine, __PRETTY_FUNCTION__, ": ", newLine)
+#define PRINT_FUNC_NAME print(newLine, __PRETTY_FUNCTION__, newLine)
 
 static char const* argv[] = {"dummy", "../names.dat", "../children_relations.dat"};
 //constexpr int argc = 3;
@@ -131,34 +131,64 @@ void readChildrenRelations()
 void unlovedChildren()
 {
     PRINT_FUNC_NAME;
-    START_TIME;
-    auto const unlovedNames = unlovedChildrenNames(names, name2RelatedNames);
-    STOP_TIME;
-    PRINT_DURATION_TIME(strFuncExec);
-    StringList const referenceNames = {"Vasya", "Richard5", "Marina"};
-    compareContainers(referenceNames, unlovedNames, FILE_LINE);
+    {
+        START_TIME;
+        auto const unlovedNames = unlovedChildrenNames({}, {});
+        STOP_TIME;
+        PRINT_DURATION_TIME(strFuncExec);
+        StringList referenceNames;
+        compareContainers(referenceNames, unlovedNames, FILE_LINE);
+    }
+    {
+        START_TIME;
+        auto const unlovedNames = unlovedChildrenNames(names, name2RelatedNames);
+        STOP_TIME;
+        PRINT_DURATION_TIME(strFuncExec);
+        StringList const referenceNames = {"Vasya", "Richard5", "Marina"};
+        compareContainers(referenceNames, unlovedNames, FILE_LINE);
+    }
 }
 
 void unhappyChildren()
 {
     PRINT_FUNC_NAME;
-    START_TIME;
-    auto const unhappyNames = unhappyChildrenNames(name2RelatedNames);
-    STOP_TIME;
-    PRINT_DURATION_TIME(strFuncExec);
-    StringList const referenceNames{"Vasya"};
-    compareContainers(referenceNames, unhappyNames, FILE_LINE);
+    {
+        START_TIME;
+        auto const unhappyNames = unhappyChildrenNames({});
+        STOP_TIME;
+        PRINT_DURATION_TIME(strFuncExec);
+        StringList referenceNames;
+        compareContainers(referenceNames, unhappyNames, FILE_LINE);
+    }
+    {
+        START_TIME;
+        auto const unhappyNames = unhappyChildrenNames(name2RelatedNames);
+        STOP_TIME;
+        PRINT_DURATION_TIME(strFuncExec);
+        StringList const referenceNames{"Vasya"};
+        compareContainers(referenceNames, unhappyNames, FILE_LINE);
+    }
 }
 
 void favoriteChildren()
 {
     PRINT_FUNC_NAME;
-    START_TIME;
-    auto const favoriteNames = favoriteChildrenNames(name2RelatedNames);
-    STOP_TIME;
-    PRINT_DURATION_TIME(strFuncExec);
-    StringList const referenceNames{"Oleg: 2", "Masha: 3"};
-    compareContainers(referenceNames, favoriteNames, FILE_LINE);
+    {
+        START_TIME;
+        auto const favoriteNames = favoriteChildrenNames({});
+        STOP_TIME;
+        PRINT_DURATION_TIME(strFuncExec);
+        StringList referenceNames;
+        compareContainers(referenceNames, favoriteNames, FILE_LINE);
+    }
+    {
+        START_TIME;
+        auto const favoriteNames = favoriteChildrenNames(name2RelatedNames);
+        STOP_TIME;
+        PRINT_DURATION_TIME(strFuncExec);
+        StringList const referenceNames{"Oleg: 2", "Masha: 3"};
+        compareContainers(referenceNames, favoriteNames, FILE_LINE);
+    }
 }
 
 /*void concurrencyReading()
@@ -210,6 +240,19 @@ void favoriteChildren()
     }
 }*/
 
+void parseResult()
+{
+    PRINT_FUNC_NAME;
+    {
+        ResultVector result{names, name2RelatedNames};
+        ParseResult parseResult(result);
+        START_TIME;
+        auto const res = parseResult.parse();
+        STOP_TIME;
+        PRINT_DURATION_TIME(strFuncExec);
+    }
+}
+
 void all()
 {
     readChildrenNames();
@@ -217,6 +260,8 @@ void all()
     unlovedChildren();
     unhappyChildren();
     favoriteChildren();
+    parseResult();
     // concurrencyReading();
 }
+
 } // namespace Test

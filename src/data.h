@@ -72,15 +72,31 @@ private:
     bool m_logToFile = false;
 };
 
+struct ParsedResult
+{
+    StringUnordSet childrenNames;
+    StringUnordMap name2RelatedNames;
+    size_t size = childrenNames.size() + name2RelatedNames.size();
+};
+
+class ParseResult
+{
+public:
+    ParseResult(ResultVector const& result);
+    ParsedResult parse();
+
+private:
+    ResultVector m_result;
+};
+
 class DisplayData
 {
 public:
-    DisplayData(ResultVector const& result);
+    DisplayData(ParsedResult const& result);
     void run() const;
 
 private:
-    StringUnordSet m_childrenNames;
-    StringUnordMap m_name2RelatedNames;
+    ParsedResult m_result;
 };
 
 StringList unlovedChildrenNames(StringUnordSet const& childrenNames,

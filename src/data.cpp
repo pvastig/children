@@ -118,8 +118,10 @@ ProcessDataFacade::ProcessDataFacade(int argc, char const** argv)
 
 void ProcessDataFacade::run() const
 {
-    auto const result = readData();
-    DisplayData(result).run();
+    auto const readRes = readData();
+    auto parsedResult = ParseResult(readRes).parse();
+    assert(parsedResult.size == 2);
+    DisplayData(parsedResult).run();
 }
 
 ResultVector ProcessDataFacade::readData() const
@@ -136,13 +138,7 @@ ResultVector ProcessDataFacade::readData() const
     return result;
 }
 
-// TODO: if size of result will be increased then it should use std::visit
-DisplayData::DisplayData(ResultVector const& result)
-try : m_childrenNames(std::get<decltype(m_childrenNames)>(result.at(0))),
-      m_name2RelatedNames(std::get<decltype(m_name2RelatedNames)>(result.at(1))) {
-} catch (std::exception& e) {
-    throw std::invalid_argument(e.what());
-}
+DisplayData::DisplayData(ParsedResult const& result) : m_result(result) {}
 
 void DisplayData::run() const
 {
@@ -174,13 +170,13 @@ void DisplayData::run() const
         switch (static_cast<UserSelect>(num)) {
         case UserSelect::UnlovedChildrenNames:
             // TODO: instead of printing to console, print to file?
-            std::cout << unlovedChildrenNames(m_childrenNames, m_name2RelatedNames);
+            std::cout << unlovedChildrenNames(m_result.childrenNames, m_result.name2RelatedNames);
             break;
         case UserSelect::UnhappyChildrenNames:
-            std::cout << unhappyChildrenNames(m_name2RelatedNames);
+            std::cout << unhappyChildrenNames(m_result.name2RelatedNames);
             break;
         case UserSelect::FavouriteChildrenNames:
-            std::cout << favoriteChildrenNames(m_name2RelatedNames);
+            std::cout << favoriteChildrenNames(m_result.name2RelatedNames);
             break;
         case UserSelect::Exit:
             std::cout << "Bye-bye :)" << utils::newLine;
@@ -245,4 +241,32 @@ std::ostream& operator<<(std::ostream& os, StringList const& container)
     utils::print(os, container);
     return os << ")";
 }
+
+ParseResult::ParseResult(const ResultVector& result) : m_result(result) {}
+
+template<class T>
+struct always_false : std::false_type
+{};
+
+ParsedResult ParseResult::parse()
+{
+    // TODO: if size is more 2, it needs to rework the place
+    assert(m_result.size() > 2);
+    ParsedResult parsedResutl;
+    for (auto const& item : m_result) {
+        std::visit(
+            [&parsedResutl, item](auto&& arg) {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, StringUnordSet>)
+                    parsedResutl.childrenNames = arg;
+                else if constexpr (std::is_same_v<T, StringUnordMap>)
+                    parsedResutl.name2RelatedNames = arg;
+                else
+                    static_assert(always_false<T>::value, "non-exhaustive visitor!");
+            },
+            item);
+    }
+    return parsedResutl;
+}
+
 } // namespace pa
