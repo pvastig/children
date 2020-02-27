@@ -76,7 +76,7 @@ struct ParsedResult
 {
     StringUnordSet childrenNames;
     StringUnordMap name2RelatedNames;
-    size_t size = childrenNames.size() + name2RelatedNames.size();
+    size_t size = 0;
 };
 
 class ParseResult

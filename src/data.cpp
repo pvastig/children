@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <fstream>
 #include <future>
+#include <type_traits>
 #include <vector>
 
 namespace pa {
@@ -118,8 +119,8 @@ ProcessDataFacade::ProcessDataFacade(int argc, char const** argv)
 
 void ProcessDataFacade::run() const
 {
-    auto const readRes = readData();
-    auto parsedResult = ParseResult(readRes).parse();
+    auto const readResult = readData();
+    auto const parsedResult = ParseResult(readResult).parse();
     assert(parsedResult.size == 2);
     DisplayData(parsedResult).run();
 }
@@ -250,23 +251,24 @@ struct always_false : std::false_type
 
 ParsedResult ParseResult::parse()
 {
-    // TODO: if size is more 2, it needs to rework the place
-    assert(m_result.size() > 2);
-    ParsedResult parsedResutl;
+    // TODO: if size is not equal 2, it needs to rework the place
+    assert(m_result.size() == 2);
+    ParsedResult parsedResut;
+    parsedResut.size = m_result.size();
     for (auto const& item : m_result) {
         std::visit(
-            [&parsedResutl, item](auto&& arg) {
+            [&parsedResut, item](auto&& arg) {
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_same_v<T, StringUnordSet>)
-                    parsedResutl.childrenNames = arg;
+                    parsedResut.childrenNames = arg;
                 else if constexpr (std::is_same_v<T, StringUnordMap>)
-                    parsedResutl.name2RelatedNames = arg;
+                    parsedResut.name2RelatedNames = arg;
                 else
-                    static_assert(always_false<T>::value, "non-exhaustive visitor!");
+                    static_assert(always_false<T>::value, "non-exhaustive visitor");
             },
             item);
     }
-    return parsedResutl;
+    return parsedResut;
 }
 
 } // namespace pa
