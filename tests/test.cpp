@@ -37,18 +37,6 @@ pa::StringUnordMap const name2RelatedNames{{"Oleg", {"Masha"}},
                                            {"Masha", {"Petya", "Oleg", "Katya"}},
                                            {"Vasya", {"Masha", "Oleg", "123Georg"}}};
 
-template<typename T, typename = void>
-struct HasSize : std::false_type
-{};
-
-template<typename T>
-struct HasSize<T, std::enable_if_t<std::is_same<decltype(std::declval<T>().size()), size_t>::value>>
-    : std::true_type
-{};
-
-template<typename T>
-constexpr bool HasSizeV = HasSize<T>::value;
-
 template<class ReferenceContainer, class ComparedContainer>
 void compareContainers(ReferenceContainer refContainer,
                        ComparedContainer cmpContainer,

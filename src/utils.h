@@ -83,35 +83,35 @@ auto runAsync(F&& f, Ts&&... params)
 
 // templates for determining whether the std::pair container element is
 template<typename T>
-struct isPair : std::false_type
+struct IsPair : std::false_type
 {};
 
 template<typename T, typename U>
-struct isPair<std::pair<T, U>> : std::true_type
+struct IsPair<std::pair<T, U>> : std::true_type
 {};
 
 template<typename T>
-constexpr bool isPairV = isPair<T>::value;
+constexpr bool isPairV = IsPair<T>::value;
 
 // templates for determining if the container is std::map
 template<typename, typename = void>
-struct isMapping : std::false_type
+struct IsMapping : std::false_type
 {};
 
 template<typename Container>
-struct isMapping<
+struct IsMapping<
     Container,
     std::enable_if_t<isPairV<typename std::iterator_traits<typename Container::iterator>::value_type>>>
     : std::true_type
 {};
 
 template<typename T>
-constexpr bool isMappingV = isMapping<T>::value;
+constexpr bool IsMappingV = IsMapping<T>::value;
 template<class Out, class Container>
-typename std::enable_if_t<isMappingV<Container>, void> print(Out& out, Container&& container);
+typename std::enable_if_t<IsMappingV<Container>, void> print(Out& out, Container&& container);
 
 template<class Out, class Container>
-typename std::enable_if_t<!isMappingV<Container>, void> print(Out& out, Container&& container);
+typename std::enable_if_t<!IsMappingV<Container>, void> print(Out& out, Container&& container);
 
 template<class Out, typename... Args>
 void print(Out& out, Args... args)
@@ -120,17 +120,30 @@ void print(Out& out, Args... args)
 }
 
 template<class Out, class Container>
-typename std::enable_if_t<!isMappingV<Container>> print(Out& out, Container&& container)
+typename std::enable_if_t<!IsMappingV<Container>> print(Out& out, Container&& container)
 {
     for (auto&& item : std::forward<Container>(container))
         out << item << newLine;
 }
 
 template<class Out, class Container>
-typename std::enable_if_t<isMappingV<Container>, void> print(Out& out, Container&& container)
+typename std::enable_if_t<IsMappingV<Container>, void> print(Out& out, Container&& container)
 {
     for (auto&& [first, second] : std::forward<Container>(container))
         out << first << " " << second;
 }
+
+// template checks whether container is size
+template<typename T, typename = void>
+struct HasSize : std::false_type
+{};
+
+template<typename T>
+struct HasSize<T, std::enable_if_t<std::is_same<decltype(std::declval<T>().size()), size_t>::value>>
+    : std::true_type
+{};
+
+template<typename T>
+constexpr bool HasSizeV = HasSize<T>::value;
 
 } // namespace utils
